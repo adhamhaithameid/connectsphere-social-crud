@@ -25,6 +25,7 @@ apps/
 ## Features
 
 - Twitter/Facebook-style social timeline layout
+- Dedicated design system (tokens + component primitives) applied across the UI
 - Simulated account switching (active profile) for multi-user testing
 - Create, read, update, and delete user profiles
 - Create, read, update, and delete posts with visibility levels
@@ -61,6 +62,7 @@ pnpm dev
 
 - `pnpm dev` - run API + web in parallel
 - `pnpm seed` - reset and seed demo data
+- `pnpm crud:smoke` - run API CRUD smoke test (requires API running)
 - `pnpm typecheck` - TypeScript checks for all workspaces
 - `pnpm lint` - lint all workspaces
 - `pnpm build` - production build for all workspaces
@@ -112,3 +114,4 @@ VITE_API_URL="http://localhost:4000"
 - This project uses a file-backed datastore to keep setup simple for reviewers.
 - Data persists in `apps/api/data/db.json`.
 - Running `pnpm seed` resets this data file with curated sample records.
+- Design system source: `apps/web/src/styles/design-system.css`.
