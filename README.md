@@ -24,12 +24,15 @@ apps/
 
 ## Features
 
+- Twitter/Facebook-style social timeline layout
+- Simulated account switching (active profile) for multi-user testing
 - Create, read, update, and delete user profiles
 - Create, read, update, and delete posts with visibility levels
-- Create, read, update, and delete interactions (LIKE, COMMENT, SHARE)
-- Search and pagination across profile/post/interaction lists
-- Live dashboard metrics (totals + interaction breakdown)
-- Seeded demo data for instant review
+- Real interaction actions on timeline cards: like, comment, share
+- Edit and delete your own posts and comments inline
+- Recent vs popular feed sorting with search
+- Live network metrics (totals + interaction breakdown)
+- Seeded social dataset for instant review
 
 ## Quick Start
 
@@ -78,7 +81,7 @@ pnpm dev
 - `DELETE /api/profiles/:id`
 
 ### Posts
-- `GET /api/posts`
+- `GET /api/posts?sort=recent|popular`
 - `GET /api/posts/:id`
 - `POST /api/posts`
 - `PATCH /api/posts/:id`
