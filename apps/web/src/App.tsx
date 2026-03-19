@@ -1147,7 +1147,7 @@ function App() {
 
               <div className="x-inline-actions x-modal-actions">
                 <button type="submit" className="x-primary-button">
-                  Save
+                  Save Profile
                 </button>
                 <button
                   type="button"
@@ -1157,7 +1157,7 @@ function App() {
                     setEditingProfileId(null);
                   }}
                 >
-                  Cancel
+                  Cancel Changes
                 </button>
               </div>
             </form>
