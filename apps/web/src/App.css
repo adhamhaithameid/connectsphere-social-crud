@@ -105,6 +105,8 @@
 
 .x-nav-item.active {
   font-weight: 700;
+  background: #1a243d;
+  border: 1px solid #2a3147;
 }
 
 .x-nav-icon {
