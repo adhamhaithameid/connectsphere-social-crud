@@ -37,6 +37,8 @@ export interface PostUpdateInput {
   visibility?: Visibility;
 }
 
+export type FeedSortMode = "recent" | "popular";
+
 export interface InteractionInput {
   postId: string;
   authorId: string;
@@ -76,9 +78,9 @@ export const client = {
     await api.delete(`/api/profiles/${id}`);
   },
 
-  async listPosts(q?: string) {
+  async listPosts(q?: string, sort: FeedSortMode = "recent") {
     const { data } = await api.get<PaginatedResponse<Post>>("/api/posts", {
-      params: { q, limit: 50 }
+      params: { q, sort, limit: 50 }
     });
     return data.data;
   },

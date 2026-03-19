@@ -1,26 +1,24 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import type { SubmitHandler } from "react-hook-form";
 import {
   client,
   getErrorMessage,
+  type FeedSortMode,
   type InteractionInput,
   type InteractionUpdateInput,
   type PostInput,
   type PostUpdateInput,
   type ProfileInput
 } from "./api";
-import type { Interaction, InteractionType, Post, Profile, Visibility } from "./types";
+import type { Interaction, Post, Profile, Visibility } from "./types";
 import "./App.css";
 
 const visibilityOptions: Visibility[] = ["PUBLIC", "FRIENDS", "PRIVATE"];
-const interactionTypeOptions: InteractionType[] = ["LIKE", "COMMENT", "SHARE"];
 const EMPTY_PROFILES: Profile[] = [];
 const EMPTY_POSTS: Post[] = [];
 const EMPTY_INTERACTIONS: Interaction[] = [];
 
-interface ProfileFormValues {
+interface ProfileDraft {
   username: string;
   displayName: string;
   bio: string;
@@ -28,66 +26,15 @@ interface ProfileFormValues {
   location: string;
 }
 
-interface PostFormValues {
-  authorId: string;
+interface PostDraft {
   content: string;
   imageUrl: string;
   visibility: Visibility;
 }
 
-interface InteractionFormValues {
-  postId: string;
-  authorId: string;
-  type: InteractionType;
-  content: string;
-}
-
-function toOptionalText(value: string): string | undefined {
+function optionalText(value: string): string | undefined {
   const normalized = value.trim();
   return normalized.length > 0 ? normalized : undefined;
-}
-
-function toProfileInput(values: ProfileFormValues): ProfileInput {
-  return {
-    username: values.username.trim(),
-    displayName: values.displayName.trim(),
-    bio: toOptionalText(values.bio),
-    avatarUrl: toOptionalText(values.avatarUrl),
-    location: toOptionalText(values.location)
-  };
-}
-
-function toPostInput(values: PostFormValues): PostInput {
-  return {
-    authorId: values.authorId,
-    content: values.content.trim(),
-    imageUrl: toOptionalText(values.imageUrl),
-    visibility: values.visibility
-  };
-}
-
-function toPostUpdateInput(values: PostFormValues): PostUpdateInput {
-  return {
-    content: values.content.trim(),
-    imageUrl: toOptionalText(values.imageUrl),
-    visibility: values.visibility
-  };
-}
-
-function toInteractionInput(values: InteractionFormValues): InteractionInput {
-  return {
-    postId: values.postId,
-    authorId: values.authorId,
-    type: values.type,
-    content: values.type === "COMMENT" ? toOptionalText(values.content) : undefined
-  };
-}
-
-function toInteractionUpdateInput(values: InteractionFormValues): InteractionUpdateInput {
-  return {
-    type: values.type,
-    content: values.type === "COMMENT" ? toOptionalText(values.content) : undefined
-  };
 }
 
 function formatDate(value: string): string {
@@ -97,38 +44,85 @@ function formatDate(value: string): string {
   }).format(new Date(value));
 }
 
-function shortContent(content: string, max = 130): string {
-  if (content.length <= max) {
-    return content;
+function timeAgo(value: string): string {
+  const now = Date.now();
+  const then = new Date(value).getTime();
+  const diffMinutes = Math.max(1, Math.floor((now - then) / (1000 * 60)));
+
+  if (diffMinutes < 60) {
+    return `${diffMinutes}m`;
   }
 
-  return content.slice(0, max) + "...";
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) {
+    return `${diffHours}h`;
+  }
+
+  return `${Math.floor(diffHours / 24)}d`;
+}
+
+function initials(name: string): string {
+  const tokens = name
+    .split(" ")
+    .map((token) => token.trim())
+    .filter(Boolean)
+    .slice(0, 2);
+
+  if (tokens.length === 0) {
+    return "U";
+  }
+
+  return tokens.map((token) => token[0].toUpperCase()).join("");
 }
 
 function App() {
   const queryClient = useQueryClient();
 
-  const [profileSearch, setProfileSearch] = useState("");
-  const [postSearch, setPostSearch] = useState("");
-  const [interactionSearch, setInteractionSearch] = useState("");
+  const [feedSearch, setFeedSearch] = useState("");
+  const [feedMode, setFeedMode] = useState<FeedSortMode>("recent");
+  const [selectedProfileId, setSelectedProfileId] = useState("");
 
-  const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
-  const [editingPost, setEditingPost] = useState<Post | null>(null);
-  const [editingInteraction, setEditingInteraction] = useState<Interaction | null>(null);
+  const [composerDraft, setComposerDraft] = useState<PostDraft>({
+    content: "",
+    imageUrl: "",
+    visibility: "PUBLIC"
+  });
+
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [postEditDraft, setPostEditDraft] = useState<PostDraft>({
+    content: "",
+    imageUrl: "",
+    visibility: "PUBLIC"
+  });
+
+  const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
+  const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [commentEditDraft, setCommentEditDraft] = useState("");
+
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
+  const [profileDraft, setProfileDraft] = useState<ProfileDraft>({
+    username: "",
+    displayName: "",
+    bio: "",
+    avatarUrl: "",
+    location: ""
+  });
 
   const profilesQuery = useQuery({
-    queryKey: ["profiles", profileSearch],
-    queryFn: () => client.listProfiles(profileSearch)
+    queryKey: ["profiles"],
+    queryFn: () => client.listProfiles()
   });
 
   const postsQuery = useQuery({
-    queryKey: ["posts", postSearch],
-    queryFn: () => client.listPosts(postSearch)
+    queryKey: ["posts", feedSearch, feedMode],
+    queryFn: () => client.listPosts(feedSearch, feedMode)
   });
 
   const interactionsQuery = useQuery({
-    queryKey: ["interactions", interactionSearch],
-    queryFn: () => client.listInteractions(interactionSearch)
+    queryKey: ["interactions"],
+    queryFn: () => client.listInteractions()
   });
 
   const overviewQuery = useQuery({
@@ -141,49 +135,104 @@ function App() {
   const interactions = interactionsQuery.data ?? EMPTY_INTERACTIONS;
   const overview = overviewQuery.data;
 
-  const profileForm = useForm<ProfileFormValues>({
-    defaultValues: {
-      username: "",
-      displayName: "",
-      bio: "",
-      avatarUrl: "",
-      location: ""
-    }
-  });
+  const profileMap = useMemo(() => {
+    return new Map(profiles.map((profile) => [profile.id, profile]));
+  }, [profiles]);
 
-  const postForm = useForm<PostFormValues>({
-    defaultValues: {
-      authorId: "",
-      content: "",
-      imageUrl: "",
-      visibility: "PUBLIC"
-    }
-  });
+  const interactionsByPost = useMemo(() => {
+    const map = new Map<string, Interaction[]>();
 
-  const interactionForm = useForm<InteractionFormValues>({
-    defaultValues: {
-      postId: "",
-      authorId: "",
-      type: "LIKE",
-      content: ""
-    }
-  });
+    interactions.forEach((interaction) => {
+      const existing = map.get(interaction.postId);
+      if (existing) {
+        existing.push(interaction);
+      } else {
+        map.set(interaction.postId, [interaction]);
+      }
+    });
 
-  useEffect(() => {
-    if (profiles.length > 0 && postForm.getValues("authorId") === "") {
-      postForm.setValue("authorId", profiles[0].id);
-    }
-  }, [profiles, postForm]);
+    map.forEach((postInteractions) => {
+      postInteractions.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    });
 
-  useEffect(() => {
-    if (profiles.length > 0 && interactionForm.getValues("authorId") === "") {
-      interactionForm.setValue("authorId", profiles[0].id);
-    }
+    return map;
+  }, [interactions]);
 
-    if (posts.length > 0 && interactionForm.getValues("postId") === "") {
-      interactionForm.setValue("postId", posts[0].id);
-    }
-  }, [profiles, posts, interactionForm]);
+  const interactionMetricsByPost = useMemo(() => {
+    const metrics = new Map<string, { likes: number; comments: number; shares: number }>();
+
+    interactions.forEach((interaction) => {
+      const bucket = metrics.get(interaction.postId) ?? { likes: 0, comments: 0, shares: 0 };
+
+      if (interaction.type === "LIKE") {
+        bucket.likes += 1;
+      }
+
+      if (interaction.type === "COMMENT") {
+        bucket.comments += 1;
+      }
+
+      if (interaction.type === "SHARE") {
+        bucket.shares += 1;
+      }
+
+      metrics.set(interaction.postId, bucket);
+    });
+
+    return metrics;
+  }, [interactions]);
+
+  const likeByPostAndAuthor = useMemo(() => {
+    const lookup = new Map<string, Interaction>();
+
+    interactions.forEach((interaction) => {
+      if (interaction.type === "LIKE") {
+        lookup.set(`${interaction.postId}:${interaction.authorId}`, interaction);
+      }
+    });
+
+    return lookup;
+  }, [interactions]);
+
+  const trendingTopics = useMemo(() => {
+    const stopWords = new Set([
+      "the",
+      "and",
+      "for",
+      "you",
+      "that",
+      "with",
+      "this",
+      "from",
+      "have",
+      "your",
+      "about",
+      "today",
+      "still"
+    ]);
+
+    const counter = new Map<string, number>();
+
+    posts.forEach((post) => {
+      post.content
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, " ")
+        .split(/\s+/)
+        .filter((token) => token.length > 3 && !stopWords.has(token))
+        .forEach((token) => {
+          counter.set(token, (counter.get(token) ?? 0) + 1);
+        });
+    });
+
+    return Array.from(counter.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+  }, [posts]);
+
+  const activeProfile =
+    profiles.find((profile) => profile.id === selectedProfileId) ?? profiles[0] ?? null;
+  const activeProfileId = activeProfile?.id ?? "";
+  const remainingComposerChars = 500 - composerDraft.content.length;
 
   const invalidateAll = async () => {
     await Promise.all([
@@ -242,539 +291,789 @@ function App() {
     onSuccess: invalidateAll
   });
 
-  const profileError = useMemo(() => {
-    const error =
+  const globalError = useMemo(() => {
+    const mutationError =
       profileCreateMutation.error ??
       profileUpdateMutation.error ??
-      profileDeleteMutation.error;
-
-    return error ? getErrorMessage(error) : null;
-  }, [profileCreateMutation.error, profileUpdateMutation.error, profileDeleteMutation.error]);
-
-  const postError = useMemo(() => {
-    const error = postCreateMutation.error ?? postUpdateMutation.error ?? postDeleteMutation.error;
-    return error ? getErrorMessage(error) : null;
-  }, [postCreateMutation.error, postUpdateMutation.error, postDeleteMutation.error]);
-
-  const interactionError = useMemo(() => {
-    const error =
+      profileDeleteMutation.error ??
+      postCreateMutation.error ??
+      postUpdateMutation.error ??
+      postDeleteMutation.error ??
       interactionCreateMutation.error ??
       interactionUpdateMutation.error ??
       interactionDeleteMutation.error;
 
-    return error ? getErrorMessage(error) : null;
-  }, [interactionCreateMutation.error, interactionUpdateMutation.error, interactionDeleteMutation.error]);
+    return mutationError ? getErrorMessage(mutationError) : null;
+  }, [
+    profileCreateMutation.error,
+    profileUpdateMutation.error,
+    profileDeleteMutation.error,
+    postCreateMutation.error,
+    postUpdateMutation.error,
+    postDeleteMutation.error,
+    interactionCreateMutation.error,
+    interactionUpdateMutation.error,
+    interactionDeleteMutation.error
+  ]);
 
-  const onProfileSubmit: SubmitHandler<ProfileFormValues> = async (values) => {
-    const payload = toProfileInput(values);
+  const handlePublishPost = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-    if (editingProfile) {
-      await profileUpdateMutation.mutateAsync({
-        id: editingProfile.id,
-        payload
-      });
-      setEditingProfile(null);
-    } else {
-      await profileCreateMutation.mutateAsync(payload);
-    }
-
-    profileForm.reset({
-      username: "",
-      displayName: "",
-      bio: "",
-      avatarUrl: "",
-      location: ""
-    });
-  };
-
-  const onPostSubmit: SubmitHandler<PostFormValues> = async (values) => {
-    if (!values.authorId) {
+    if (!activeProfile) {
       return;
     }
 
-    if (editingPost) {
-      await postUpdateMutation.mutateAsync({
-        id: editingPost.id,
-        payload: toPostUpdateInput(values)
-      });
-      setEditingPost(null);
-    } else {
-      await postCreateMutation.mutateAsync(toPostInput(values));
-    }
+    const payload: PostInput = {
+      authorId: activeProfile.id,
+      content: composerDraft.content.trim(),
+      imageUrl: optionalText(composerDraft.imageUrl),
+      visibility: composerDraft.visibility
+    };
 
-    postForm.reset({
-      authorId: profiles[0]?.id ?? "",
-      content: "",
-      imageUrl: "",
-      visibility: "PUBLIC"
-    });
-  };
-
-  const onInteractionSubmit: SubmitHandler<InteractionFormValues> = async (values) => {
-    if (!values.authorId || !values.postId) {
+    if (!payload.content) {
       return;
     }
 
-    if (editingInteraction) {
-      await interactionUpdateMutation.mutateAsync({
-        id: editingInteraction.id,
-        payload: toInteractionUpdateInput(values)
-      });
-      setEditingInteraction(null);
-    } else {
-      await interactionCreateMutation.mutateAsync(toInteractionInput(values));
+    await postCreateMutation.mutateAsync(payload);
+    setComposerDraft({ content: "", imageUrl: "", visibility: "PUBLIC" });
+  };
+
+  const handleToggleLike = async (postId: string) => {
+    if (!activeProfile) {
+      return;
     }
 
-    interactionForm.reset({
-      postId: posts[0]?.id ?? "",
-      authorId: profiles[0]?.id ?? "",
-      type: "LIKE",
-      content: ""
-    });
+    const existing = likeByPostAndAuthor.get(`${postId}:${activeProfile.id}`);
+
+    if (existing) {
+      await interactionDeleteMutation.mutateAsync(existing.id);
+      return;
+    }
+
+    const payload: InteractionInput = {
+      postId,
+      authorId: activeProfile.id,
+      type: "LIKE"
+    };
+
+    await interactionCreateMutation.mutateAsync(payload);
   };
 
-  const startProfileEdit = (profile: Profile) => {
-    setEditingProfile(profile);
-    profileForm.reset({
-      username: profile.username,
-      displayName: profile.displayName,
-      bio: profile.bio ?? "",
-      avatarUrl: profile.avatarUrl ?? "",
-      location: profile.location ?? ""
-    });
+  const handleShare = async (postId: string) => {
+    if (!activeProfile) {
+      return;
+    }
+
+    const payload: InteractionInput = {
+      postId,
+      authorId: activeProfile.id,
+      type: "SHARE"
+    };
+
+    await interactionCreateMutation.mutateAsync(payload);
   };
 
-  const cancelProfileEdit = () => {
-    setEditingProfile(null);
-    profileForm.reset({
-      username: "",
-      displayName: "",
-      bio: "",
-      avatarUrl: "",
-      location: ""
-    });
+  const handleCommentSubmit = async (postId: string) => {
+    if (!activeProfile) {
+      return;
+    }
+
+    const content = (commentDrafts[postId] ?? "").trim();
+    if (!content) {
+      return;
+    }
+
+    const payload: InteractionInput = {
+      postId,
+      authorId: activeProfile.id,
+      type: "COMMENT",
+      content
+    };
+
+    await interactionCreateMutation.mutateAsync(payload);
+    setCommentDrafts((previous) => ({
+      ...previous,
+      [postId]: ""
+    }));
   };
 
-  const startPostEdit = (post: Post) => {
-    setEditingPost(post);
-    postForm.reset({
-      authorId: post.authorId,
+  const handleStartPostEdit = (post: Post) => {
+    setEditingPostId(post.id);
+    setPostEditDraft({
       content: post.content,
       imageUrl: post.imageUrl ?? "",
       visibility: post.visibility
     });
   };
 
-  const cancelPostEdit = () => {
-    setEditingPost(null);
-    postForm.reset({
-      authorId: profiles[0]?.id ?? "",
-      content: "",
-      imageUrl: "",
-      visibility: "PUBLIC"
+  const handlePostSave = async () => {
+    if (!editingPostId) {
+      return;
+    }
+
+    const content = postEditDraft.content.trim();
+    if (!content) {
+      return;
+    }
+
+    const payload: PostUpdateInput = {
+      content,
+      imageUrl: optionalText(postEditDraft.imageUrl),
+      visibility: postEditDraft.visibility
+    };
+
+    await postUpdateMutation.mutateAsync({
+      id: editingPostId,
+      payload
     });
+
+    setEditingPostId(null);
   };
 
-  const startInteractionEdit = (interaction: Interaction) => {
-    setEditingInteraction(interaction);
-    interactionForm.reset({
-      postId: interaction.postId,
-      authorId: interaction.authorId,
-      type: interaction.type,
-      content: interaction.content ?? ""
+  const openProfileCreator = () => {
+    setEditingProfileId(null);
+    setProfileDraft({
+      username: "",
+      displayName: "",
+      bio: "",
+      avatarUrl: "",
+      location: ""
     });
+    setProfileModalOpen(true);
   };
 
-  const cancelInteractionEdit = () => {
-    setEditingInteraction(null);
-    interactionForm.reset({
-      postId: posts[0]?.id ?? "",
-      authorId: profiles[0]?.id ?? "",
-      type: "LIKE",
-      content: ""
+  const openProfileEditor = (profile: Profile) => {
+    setEditingProfileId(profile.id);
+    setProfileDraft({
+      username: profile.username,
+      displayName: profile.displayName,
+      bio: profile.bio ?? "",
+      avatarUrl: profile.avatarUrl ?? "",
+      location: profile.location ?? ""
     });
+    setProfileModalOpen(true);
+  };
+
+  const submitProfile = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const payload: ProfileInput = {
+      username: profileDraft.username.trim(),
+      displayName: profileDraft.displayName.trim(),
+      bio: optionalText(profileDraft.bio),
+      avatarUrl: optionalText(profileDraft.avatarUrl),
+      location: optionalText(profileDraft.location)
+    };
+
+    if (!payload.username || !payload.displayName) {
+      return;
+    }
+
+    if (editingProfileId) {
+      await profileUpdateMutation.mutateAsync({
+        id: editingProfileId,
+        payload
+      });
+    } else {
+      await profileCreateMutation.mutateAsync(payload);
+    }
+
+    setProfileModalOpen(false);
+    setEditingProfileId(null);
+  };
+
+  const deleteProfile = async (profileId: string) => {
+    if (!window.confirm("Delete this profile and all related posts/interactions?")) {
+      return;
+    }
+
+    await profileDeleteMutation.mutateAsync(profileId);
+
+    if (activeProfileId === profileId) {
+      setSelectedProfileId("");
+    }
+  };
+
+  const beginCommentEdit = (interaction: Interaction) => {
+    setEditingCommentId(interaction.id);
+    setCommentEditDraft(interaction.content ?? "");
+  };
+
+  const saveCommentEdit = async () => {
+    if (!editingCommentId) {
+      return;
+    }
+
+    const content = commentEditDraft.trim();
+    if (!content) {
+      return;
+    }
+
+    const payload: InteractionUpdateInput = {
+      type: "COMMENT",
+      content
+    };
+
+    await interactionUpdateMutation.mutateAsync({
+      id: editingCommentId,
+      payload
+    });
+
+    setEditingCommentId(null);
+    setCommentEditDraft("");
   };
 
   return (
-    <div className="page-shell">
-      <header className="hero-section">
-        <p className="kicker">Internship Portfolio Project</p>
-        <h1>ConnectSphere Social CRUD Platform</h1>
-        <p className="hero-copy">
-          Full-stack social media dashboard with complete CRUD support for profiles, posts, and
-          interactions.
-        </p>
-
-        <div className="stats-grid">
-          <article className="stat-card">
-            <p className="stat-title">Profiles</p>
-            <p className="stat-value">{overview?.totals.profiles ?? 0}</p>
-          </article>
-          <article className="stat-card">
-            <p className="stat-title">Posts</p>
-            <p className="stat-value">{overview?.totals.posts ?? 0}</p>
-          </article>
-          <article className="stat-card">
-            <p className="stat-title">Interactions</p>
-            <p className="stat-value">{overview?.totals.interactions ?? 0}</p>
-          </article>
-          <article className="stat-card wide">
-            <p className="stat-title">Interaction Mix</p>
-            <p className="stat-line">
-              Likes: {overview?.interactionBreakdown.LIKE ?? 0} | Comments:{" "}
-              {overview?.interactionBreakdown.COMMENT ?? 0} | Shares:{" "}
-              {overview?.interactionBreakdown.SHARE ?? 0}
-            </p>
-          </article>
-        </div>
-      </header>
-
-      <main className="dashboard-grid">
-        <section className="panel">
-          <div className="panel-head">
-            <h2>Profiles</h2>
-            <input
-              value={profileSearch}
-              onChange={(event) => setProfileSearch(event.target.value)}
-              placeholder="Search profiles"
-            />
-          </div>
-
-          <form className="stack-form" onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
-            <label>
-              Username
-              <input
-                {...profileForm.register("username", { required: "Username is required" })}
-                placeholder="sam.dev"
-                disabled={Boolean(editingProfile)}
-              />
-              {profileForm.formState.errors.username ? (
-                <small>{profileForm.formState.errors.username.message}</small>
-              ) : null}
-            </label>
-
-            <label>
-              Display Name
-              <input
-                {...profileForm.register("displayName", { required: "Display name is required" })}
-                placeholder="Samir Aziz"
-              />
-              {profileForm.formState.errors.displayName ? (
-                <small>{profileForm.formState.errors.displayName.message}</small>
-              ) : null}
-            </label>
-
-            <label>
-              Bio
-              <textarea
-                rows={3}
-                {...profileForm.register("bio")}
-                placeholder="Short profile summary"
-              />
-            </label>
-
-            <label>
-              Avatar URL
-              <input {...profileForm.register("avatarUrl")} placeholder="https://..." />
-            </label>
-
-            <label>
-              Location
-              <input {...profileForm.register("location")} placeholder="Cairo, Egypt" />
-            </label>
-
-            {profileError ? <p className="error-line">{profileError}</p> : null}
-
-            <div className="form-actions">
-              <button
-                type="submit"
-                disabled={profileCreateMutation.isPending || profileUpdateMutation.isPending}
-              >
-                {editingProfile ? "Update Profile" : "Create Profile"}
-              </button>
-              {editingProfile ? (
-                <button type="button" className="ghost" onClick={cancelProfileEdit}>
-                  Cancel
-                </button>
-              ) : null}
-            </div>
-          </form>
-
-          <div className="list-wrap">
-            {profilesQuery.isLoading ? <p className="muted">Loading profiles...</p> : null}
-            {profiles.map((profile) => (
-              <article key={profile.id} className="list-card">
-                <div className="row-between">
-                  <div>
-                    <h3>{profile.displayName}</h3>
-                    <p className="muted">@{profile.username}</p>
-                  </div>
-                  <span className="badge">{profile._count?.posts ?? 0} posts</span>
-                </div>
-                {profile.bio ? <p>{profile.bio}</p> : <p className="muted">No bio available.</p>}
-                <p className="muted">{profile.location ?? "No location"}</p>
-                <p className="tiny">Created {formatDate(profile.createdAt)}</p>
-                <div className="card-actions">
-                  <button type="button" className="ghost" onClick={() => startProfileEdit(profile)}>
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    className="danger"
-                    onClick={async () => {
-                      if (!window.confirm("Delete this profile and related data?")) {
-                        return;
-                      }
-                      await profileDeleteMutation.mutateAsync(profile.id);
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
+    <div className="social-shell">
+      <aside className="column left-column">
+        <section className="card brand-card">
+          <p className="brand-mark">ConnectSphere</p>
+          <h1>Social HQ</h1>
+          <p className="muted">A real timeline-style social platform for your internship showcase.</p>
         </section>
 
-        <section className="panel">
-          <div className="panel-head">
-            <h2>Posts</h2>
-            <input
-              value={postSearch}
-              onChange={(event) => setPostSearch(event.target.value)}
-              placeholder="Search posts"
-            />
-          </div>
+        <section className="card active-profile-card">
+          <p className="section-title">Active User</p>
+          {activeProfile ? (
+            <>
+              <div className="identity-row">
+                <div className="avatar">
+                  {activeProfile.avatarUrl ? (
+                    <img src={activeProfile.avatarUrl} alt={activeProfile.displayName} />
+                  ) : (
+                    <span>{initials(activeProfile.displayName)}</span>
+                  )}
+                </div>
+                <div>
+                  <p className="name">{activeProfile.displayName}</p>
+                  <p className="handle">@{activeProfile.username}</p>
+                </div>
+              </div>
 
-          <form className="stack-form" onSubmit={postForm.handleSubmit(onPostSubmit)}>
-            <label>
-              Author
               <select
-                {...postForm.register("authorId", { required: "Author is required" })}
-                disabled={profiles.length === 0 || Boolean(editingPost)}
+                value={activeProfileId}
+                onChange={(event) => setSelectedProfileId(event.target.value)}
               >
-                {profiles.length === 0 ? <option value="">Create a profile first</option> : null}
                 {profiles.map((profile) => (
                   <option key={profile.id} value={profile.id}>
                     {profile.displayName}
                   </option>
                 ))}
               </select>
-            </label>
+            </>
+          ) : (
+            <p className="muted">Create your first profile to start posting.</p>
+          )}
 
-            <label>
-              Content
-              <textarea
-                rows={4}
-                {...postForm.register("content", { required: "Post content is required" })}
-                placeholder="What is happening today?"
+          <button type="button" className="solid" onClick={openProfileCreator}>
+            Create Profile
+          </button>
+        </section>
+
+        <section className="card metrics-card">
+          <p className="section-title">Network Snapshot</p>
+          <div className="metric-grid">
+            <article>
+              <strong>{overview?.totals.profiles ?? 0}</strong>
+              <span>Profiles</span>
+            </article>
+            <article>
+              <strong>{overview?.totals.posts ?? 0}</strong>
+              <span>Posts</span>
+            </article>
+            <article>
+              <strong>{overview?.totals.interactions ?? 0}</strong>
+              <span>Interactions</span>
+            </article>
+          </div>
+        </section>
+      </aside>
+
+      <main className="column center-column">
+        <section className="card search-card">
+          <div className="feed-mode-tabs">
+            <button
+              type="button"
+              className={feedMode === "recent" ? "tab active" : "tab"}
+              onClick={() => setFeedMode("recent")}
+            >
+              Recent
+            </button>
+            <button
+              type="button"
+              className={feedMode === "popular" ? "tab active" : "tab"}
+              onClick={() => setFeedMode("popular")}
+            >
+              Popular
+            </button>
+          </div>
+          <input
+            value={feedSearch}
+            onChange={(event) => setFeedSearch(event.target.value)}
+            placeholder="Search timeline by text or author"
+          />
+        </section>
+
+        <section className="card composer-card">
+          <p className="section-title">Compose Post</p>
+          <form onSubmit={handlePublishPost} className="composer-form">
+            <textarea
+              rows={4}
+              value={composerDraft.content}
+              onChange={(event) =>
+                setComposerDraft((previous) => ({
+                  ...previous,
+                  content: event.target.value
+                }))
+              }
+              placeholder="What is happening right now?"
+            />
+            <p className={remainingComposerChars < 60 ? "char-hint warning" : "char-hint"}>
+              {remainingComposerChars} characters remaining
+            </p>
+
+            <div className="composer-row">
+              <input
+                value={composerDraft.imageUrl}
+                onChange={(event) =>
+                  setComposerDraft((previous) => ({
+                    ...previous,
+                    imageUrl: event.target.value
+                  }))
+                }
+                placeholder="Optional image URL"
               />
-              {postForm.formState.errors.content ? (
-                <small>{postForm.formState.errors.content.message}</small>
-              ) : null}
-            </label>
-
-            <label>
-              Image URL
-              <input {...postForm.register("imageUrl")} placeholder="https://..." />
-            </label>
-
-            <label>
-              Visibility
-              <select {...postForm.register("visibility")}>
+              <select
+                value={composerDraft.visibility}
+                onChange={(event) =>
+                  setComposerDraft((previous) => ({
+                    ...previous,
+                    visibility: event.target.value as Visibility
+                  }))
+                }
+              >
                 {visibilityOptions.map((option) => (
                   <option key={option} value={option}>
                     {option}
                   </option>
                 ))}
               </select>
-            </label>
-
-            {postError ? <p className="error-line">{postError}</p> : null}
-
-            <div className="form-actions">
-              <button
-                type="submit"
-                disabled={postCreateMutation.isPending || postUpdateMutation.isPending || profiles.length === 0}
-              >
-                {editingPost ? "Update Post" : "Create Post"}
-              </button>
-              {editingPost ? (
-                <button type="button" className="ghost" onClick={cancelPostEdit}>
-                  Cancel
-                </button>
-              ) : null}
             </div>
-          </form>
 
-          <div className="list-wrap">
-            {postsQuery.isLoading ? <p className="muted">Loading posts...</p> : null}
-            {posts.map((post) => (
-              <article key={post.id} className="list-card">
-                <div className="row-between">
-                  <h3>{post.author?.displayName ?? "Unknown author"}</h3>
-                  <span className="badge">{post.visibility}</span>
-                </div>
-                <p>{post.content}</p>
-                {post.imageUrl ? (
-                  <a href={post.imageUrl} target="_blank" rel="noreferrer" className="tiny-link">
-                    Open image
-                  </a>
-                ) : null}
-                <p className="tiny">
-                  {post._count?.interactions ?? 0} interactions | {formatDate(post.createdAt)}
-                </p>
-                <div className="card-actions">
-                  <button type="button" className="ghost" onClick={() => startPostEdit(post)}>
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    className="danger"
-                    onClick={async () => {
-                      if (!window.confirm("Delete this post and related interactions?")) {
-                        return;
-                      }
-                      await postDeleteMutation.mutateAsync(post.id);
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
+            <button
+              type="submit"
+              className="solid"
+              disabled={!activeProfile || !composerDraft.content.trim() || remainingComposerChars < 0}
+            >
+              Publish
+            </button>
+          </form>
         </section>
 
-        <section className="panel">
-          <div className="panel-head">
-            <h2>Interactions</h2>
-            <input
-              value={interactionSearch}
-              onChange={(event) => setInteractionSearch(event.target.value)}
-              placeholder="Search interactions"
-            />
-          </div>
+        {globalError ? <p className="error-banner">{globalError}</p> : null}
 
-          <form className="stack-form" onSubmit={interactionForm.handleSubmit(onInteractionSubmit)}>
-            <label>
-              Post
-              <select
-                {...interactionForm.register("postId", { required: "Post is required" })}
-                disabled={posts.length === 0 || Boolean(editingInteraction)}
-              >
-                {posts.length === 0 ? <option value="">Create a post first</option> : null}
-                {posts.map((post) => (
-                  <option key={post.id} value={post.id}>
-                    {shortContent(post.content, 45)}
-                  </option>
-                ))}
-              </select>
-            </label>
+        <section className="timeline-list">
+          {postsQuery.isLoading ? <p className="muted">Loading timeline...</p> : null}
+          {!postsQuery.isLoading && posts.length === 0 ? (
+            <article className="card post-card">
+              <p className="name">No posts found</p>
+              <p className="muted">
+                Try another search term or publish the first post from your active profile.
+              </p>
+            </article>
+          ) : null}
 
-            <label>
-              Actor
-              <select
-                {...interactionForm.register("authorId", { required: "Actor is required" })}
-                disabled={profiles.length === 0 || Boolean(editingInteraction)}
-              >
-                {profiles.length === 0 ? <option value="">Create a profile first</option> : null}
-                {profiles.map((profile) => (
-                  <option key={profile.id} value={profile.id}>
-                    {profile.displayName}
-                  </option>
-                ))}
-              </select>
-            </label>
+          {posts.map((post) => {
+            const author = profileMap.get(post.authorId);
+            const metrics = interactionMetricsByPost.get(post.id) ?? {
+              likes: 0,
+              comments: 0,
+              shares: 0
+            };
 
-            <label>
-              Type
-              <select {...interactionForm.register("type")}>
-                {interactionTypeOptions.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-            </label>
+            const comments = (interactionsByPost.get(post.id) ?? []).filter(
+              (interaction) => interaction.type === "COMMENT"
+            );
 
-            <label>
-              Comment Content (only for COMMENT)
-              <textarea rows={3} {...interactionForm.register("content")} placeholder="Write a comment" />
-            </label>
+            const likedByActive = activeProfile
+              ? likeByPostAndAuthor.has(`${post.id}:${activeProfile.id}`)
+              : false;
 
-            {interactionError ? <p className="error-line">{interactionError}</p> : null}
+            const canManagePost = activeProfile?.id === post.authorId;
 
-            <div className="form-actions">
-              <button
-                type="submit"
-                disabled={
-                  interactionCreateMutation.isPending ||
-                  interactionUpdateMutation.isPending ||
-                  profiles.length === 0 ||
-                  posts.length === 0
-                }
-              >
-                {editingInteraction ? "Update Interaction" : "Create Interaction"}
-              </button>
-              {editingInteraction ? (
-                <button type="button" className="ghost" onClick={cancelInteractionEdit}>
-                  Cancel
-                </button>
-              ) : null}
-            </div>
-          </form>
+            return (
+              <article key={post.id} className="card post-card">
+                <div className="post-head">
+                  <div className="identity-row">
+                    <div className="avatar small">
+                      {author?.avatarUrl ? (
+                        <img src={author.avatarUrl} alt={author.displayName} />
+                      ) : (
+                        <span>{initials(author?.displayName ?? "User")}</span>
+                      )}
+                    </div>
+                    <div>
+                      <p className="name">{author?.displayName ?? "Deleted user"}</p>
+                      <p className="handle">
+                        @{author?.username ?? "unknown"} · {timeAgo(post.createdAt)}
+                      </p>
+                    </div>
+                  </div>
 
-          <div className="list-wrap">
-            {interactionsQuery.isLoading ? <p className="muted">Loading interactions...</p> : null}
-            {interactions.map((interaction) => (
-              <article key={interaction.id} className="list-card">
-                <div className="row-between">
-                  <h3>{interaction.author?.displayName ?? "Unknown user"}</h3>
-                  <span className={"chip " + interaction.type.toLowerCase()}>{interaction.type}</span>
+                  <span className="visibility-pill">{post.visibility}</span>
                 </div>
-                <p className="muted">On post: {shortContent(interaction.post?.content ?? "Unknown post", 70)}</p>
-                {interaction.content ? <p>{interaction.content}</p> : null}
-                <p className="tiny">{formatDate(interaction.createdAt)}</p>
-                <div className="card-actions">
-                  <button
-                    type="button"
-                    className="ghost"
-                    onClick={() => startInteractionEdit(interaction)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    className="danger"
-                    onClick={async () => {
-                      if (!window.confirm("Delete this interaction?")) {
-                        return;
+
+                {editingPostId === post.id ? (
+                  <div className="edit-box">
+                    <textarea
+                      rows={4}
+                      value={postEditDraft.content}
+                      onChange={(event) =>
+                        setPostEditDraft((previous) => ({
+                          ...previous,
+                          content: event.target.value
+                        }))
                       }
-                      await interactionDeleteMutation.mutateAsync(interaction.id);
-                    }}
+                    />
+                    <div className="composer-row">
+                      <input
+                        value={postEditDraft.imageUrl}
+                        onChange={(event) =>
+                          setPostEditDraft((previous) => ({
+                            ...previous,
+                            imageUrl: event.target.value
+                          }))
+                        }
+                        placeholder="Optional image URL"
+                      />
+                      <select
+                        value={postEditDraft.visibility}
+                        onChange={(event) =>
+                          setPostEditDraft((previous) => ({
+                            ...previous,
+                            visibility: event.target.value as Visibility
+                          }))
+                        }
+                      >
+                        {visibilityOptions.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="action-row compact">
+                      <button type="button" className="solid" onClick={handlePostSave}>
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        className="ghost"
+                        onClick={() => setEditingPostId(null)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="post-text">{post.content}</p>
+                    {post.imageUrl ? (
+                      <img src={post.imageUrl} alt="Post attachment" className="post-media" />
+                    ) : null}
+                  </>
+                )}
+
+                <div className="action-row">
+                  <button
+                    type="button"
+                    className={likedByActive ? "action liked" : "action"}
+                    onClick={() => handleToggleLike(post.id)}
+                    disabled={!activeProfile}
                   >
-                    Delete
+                    Like · {metrics.likes}
+                  </button>
+                  <button
+                    type="button"
+                    className="action"
+                    onClick={() => setExpandedPostId(expandedPostId === post.id ? null : post.id)}
+                  >
+                    Comment · {metrics.comments}
+                  </button>
+                  <button
+                    type="button"
+                    className="action"
+                    onClick={() => handleShare(post.id)}
+                    disabled={!activeProfile}
+                  >
+                    Share · {metrics.shares}
                   </button>
                 </div>
+
+                {canManagePost ? (
+                  <div className="action-row compact">
+                    <button type="button" className="ghost" onClick={() => handleStartPostEdit(post)}>
+                      Edit Post
+                    </button>
+                    <button
+                      type="button"
+                      className="danger"
+                      onClick={async () => {
+                        if (!window.confirm("Delete this post and all comments/likes/shares?")) {
+                          return;
+                        }
+                        await postDeleteMutation.mutateAsync(post.id);
+                      }}
+                    >
+                      Delete Post
+                    </button>
+                  </div>
+                ) : null}
+
+                {expandedPostId === post.id || comments.length > 0 ? (
+                  <div className="comments-zone">
+                    {comments.map((comment) => {
+                      const commentAuthor = profileMap.get(comment.authorId);
+                      const canManageComment = activeProfile?.id === comment.authorId;
+
+                      return (
+                        <article key={comment.id} className="comment-item">
+                          <p className="comment-meta">
+                            <strong>{commentAuthor?.displayName ?? "Unknown"}</strong> · {formatDate(comment.createdAt)}
+                          </p>
+
+                          {editingCommentId === comment.id ? (
+                            <>
+                              <textarea
+                                rows={3}
+                                value={commentEditDraft}
+                                onChange={(event) => setCommentEditDraft(event.target.value)}
+                              />
+                              <div className="action-row compact">
+                                <button type="button" className="solid" onClick={saveCommentEdit}>
+                                  Save
+                                </button>
+                                <button
+                                  type="button"
+                                  className="ghost"
+                                  onClick={() => {
+                                    setEditingCommentId(null);
+                                    setCommentEditDraft("");
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </>
+                          ) : (
+                            <p>{comment.content}</p>
+                          )}
+
+                          {canManageComment && editingCommentId !== comment.id ? (
+                            <div className="action-row compact">
+                              <button
+                                type="button"
+                                className="ghost"
+                                onClick={() => beginCommentEdit(comment)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                className="danger"
+                                onClick={async () => {
+                                  if (!window.confirm("Delete this comment?")) {
+                                    return;
+                                  }
+                                  await interactionDeleteMutation.mutateAsync(comment.id);
+                                }}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          ) : null}
+                        </article>
+                      );
+                    })}
+
+                    <div className="comment-compose">
+                      <input
+                        value={commentDrafts[post.id] ?? ""}
+                        onChange={(event) =>
+                          setCommentDrafts((previous) => ({
+                            ...previous,
+                            [post.id]: event.target.value
+                          }))
+                        }
+                        placeholder="Write a comment"
+                      />
+                      <button
+                        type="button"
+                        className="solid"
+                        disabled={!activeProfile}
+                        onClick={() => handleCommentSubmit(post.id)}
+                      >
+                        Post
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
               </article>
-            ))}
-          </div>
+            );
+          })}
         </section>
       </main>
 
-      <section className="recent-strip">
-        <h2>Latest Activity</h2>
-        <div className="recent-grid">
-          {(overview?.recentPosts ?? []).map((post) => (
-            <article key={post.id} className="recent-card">
-              <p className="muted">{post.author?.displayName ?? "Unknown"}</p>
-              <p>{shortContent(post.content, 100)}</p>
-              <p className="tiny">{post._count?.interactions ?? 0} interactions</p>
-            </article>
-          ))}
+      <aside className="column right-column">
+        <section className="card">
+          <p className="section-title">Trending</p>
+          {trendingTopics.length === 0 ? <p className="muted">No trends yet.</p> : null}
+          <div className="trend-list">
+            {trendingTopics.map(([topic, score]) => (
+              <article key={topic}>
+                <p className="name">#{topic}</p>
+                <p className="muted">{score} mentions</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="card">
+          <p className="section-title">People</p>
+          <div className="profile-list">
+            {profiles.map((profile) => (
+              <article key={profile.id} className="profile-row">
+                <div>
+                  <p className="name">{profile.displayName}</p>
+                  <p className="handle">@{profile.username}</p>
+                </div>
+                <div className="profile-actions">
+                  <button
+                    type="button"
+                    className="ghost"
+                    onClick={() => setSelectedProfileId(profile.id)}
+                  >
+                    Switch
+                  </button>
+                  <button type="button" className="ghost" onClick={() => openProfileEditor(profile)}>
+                    Edit
+                  </button>
+                  <button type="button" className="danger" onClick={() => void deleteProfile(profile.id)}>
+                    Delete
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="card">
+          <p className="section-title">Recent Activity</p>
+          <div className="recent-list">
+            {(overview?.recentPosts ?? []).map((post) => (
+              <article key={post.id}>
+                <p className="name">{post.author?.displayName ?? "Unknown"}</p>
+                <p className="muted">{post.content}</p>
+                <p className="handle">{post._count?.interactions ?? 0} interactions</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      </aside>
+
+      {profileModalOpen ? (
+        <div className="modal-backdrop">
+          <div className="modal-card">
+            <h2>{editingProfileId ? "Edit Profile" : "Create Profile"}</h2>
+            <form onSubmit={submitProfile} className="profile-form">
+              <label>
+                Username
+                <input
+                  value={profileDraft.username}
+                  onChange={(event) =>
+                    setProfileDraft((previous) => ({
+                      ...previous,
+                      username: event.target.value
+                    }))
+                  }
+                  disabled={Boolean(editingProfileId)}
+                  required
+                />
+              </label>
+
+              <label>
+                Display Name
+                <input
+                  value={profileDraft.displayName}
+                  onChange={(event) =>
+                    setProfileDraft((previous) => ({
+                      ...previous,
+                      displayName: event.target.value
+                    }))
+                  }
+                  required
+                />
+              </label>
+
+              <label>
+                Bio
+                <textarea
+                  rows={3}
+                  value={profileDraft.bio}
+                  onChange={(event) =>
+                    setProfileDraft((previous) => ({
+                      ...previous,
+                      bio: event.target.value
+                    }))
+                  }
+                />
+              </label>
+
+              <label>
+                Avatar URL
+                <input
+                  value={profileDraft.avatarUrl}
+                  onChange={(event) =>
+                    setProfileDraft((previous) => ({
+                      ...previous,
+                      avatarUrl: event.target.value
+                    }))
+                  }
+                />
+              </label>
+
+              <label>
+                Location
+                <input
+                  value={profileDraft.location}
+                  onChange={(event) =>
+                    setProfileDraft((previous) => ({
+                      ...previous,
+                      location: event.target.value
+                    }))
+                  }
+                />
+              </label>
+
+              <div className="modal-actions">
+                <button type="submit" className="solid">
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={() => {
+                    setProfileModalOpen(false);
+                    setEditingProfileId(null);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </section>
+      ) : null}
     </div>
   );
 }
