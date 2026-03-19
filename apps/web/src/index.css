@@ -1,47 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Merriweather:wght@700&display=swap");
-
-:root {
-  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
-  line-height: 1.45;
-  font-weight: 400;
-  color: #0f2738;
-  background:
-    radial-gradient(circle at 12% 6%, rgba(116, 182, 223, 0.26), transparent 28%),
-    radial-gradient(circle at 90% 88%, rgba(255, 186, 138, 0.28), transparent 32%),
-    linear-gradient(155deg, #ecf5fb 0%, #f8fbff 55%, #fff8f2 100%);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-}
-
-h1,
-h2,
-h3 {
-  margin: 0;
-  font-family: "Merriweather", Georgia, serif;
-  color: #18354a;
-}
-
-p {
-  margin: 0;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
+@import "./styles/design-system.css";
 
 #root {
   min-height: 100vh;

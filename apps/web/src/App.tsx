@@ -526,13 +526,13 @@ function App() {
   return (
     <div className="social-shell">
       <aside className="column left-column">
-        <section className="card brand-card">
+        <section className="ds-card card brand-card">
           <p className="brand-mark">ConnectSphere</p>
           <h1>Social HQ</h1>
           <p className="muted">A real timeline-style social platform for your internship showcase.</p>
         </section>
 
-        <section className="card active-profile-card">
+        <section className="ds-card card active-profile-card">
           <p className="section-title">Active User</p>
           {activeProfile ? (
             <>
@@ -565,12 +565,12 @@ function App() {
             <p className="muted">Create your first profile to start posting.</p>
           )}
 
-          <button type="button" className="solid" onClick={openProfileCreator}>
+          <button type="button" className="ds-button ds-button--primary solid" onClick={openProfileCreator}>
             Create Profile
           </button>
         </section>
 
-        <section className="card metrics-card">
+        <section className="ds-card card metrics-card">
           <p className="section-title">Network Snapshot</p>
           <div className="metric-grid">
             <article>
@@ -590,18 +590,18 @@ function App() {
       </aside>
 
       <main className="column center-column">
-        <section className="card search-card">
+        <section className="ds-card card search-card">
           <div className="feed-mode-tabs">
             <button
               type="button"
-              className={feedMode === "recent" ? "tab active" : "tab"}
+              className={feedMode === "recent" ? "ds-button tab active" : "ds-button tab"}
               onClick={() => setFeedMode("recent")}
             >
               Recent
             </button>
             <button
               type="button"
-              className={feedMode === "popular" ? "tab active" : "tab"}
+              className={feedMode === "popular" ? "ds-button tab active" : "ds-button tab"}
               onClick={() => setFeedMode("popular")}
             >
               Popular
@@ -614,7 +614,7 @@ function App() {
           />
         </section>
 
-        <section className="card composer-card">
+        <section className="ds-card card composer-card">
           <p className="section-title">Compose Post</p>
           <form onSubmit={handlePublishPost} className="composer-form">
             <textarea
@@ -662,7 +662,7 @@ function App() {
 
             <button
               type="submit"
-              className="solid"
+              className="ds-button ds-button--primary solid"
               disabled={!activeProfile || !composerDraft.content.trim() || remainingComposerChars < 0}
             >
               Publish
@@ -675,7 +675,7 @@ function App() {
         <section className="timeline-list">
           {postsQuery.isLoading ? <p className="muted">Loading timeline...</p> : null}
           {!postsQuery.isLoading && posts.length === 0 ? (
-            <article className="card post-card">
+            <article className="ds-card card post-card">
               <p className="name">No posts found</p>
               <p className="muted">
                 Try another search term or publish the first post from your active profile.
@@ -702,7 +702,7 @@ function App() {
             const canManagePost = activeProfile?.id === post.authorId;
 
             return (
-              <article key={post.id} className="card post-card">
+              <article key={post.id} className="ds-card card post-card">
                 <div className="post-head">
                   <div className="identity-row">
                     <div className="avatar small">
@@ -763,12 +763,12 @@ function App() {
                       </select>
                     </div>
                     <div className="action-row compact">
-                      <button type="button" className="solid" onClick={handlePostSave}>
+                      <button type="button" className="ds-button ds-button--primary solid" onClick={handlePostSave}>
                         Save
                       </button>
                       <button
                         type="button"
-                        className="ghost"
+                        className="ds-button ds-button--ghost ghost"
                         onClick={() => setEditingPostId(null)}
                       >
                         Cancel
@@ -787,7 +787,7 @@ function App() {
                 <div className="action-row">
                   <button
                     type="button"
-                    className={likedByActive ? "action liked" : "action"}
+                    className={likedByActive ? "ds-button ds-button--ghost action liked" : "ds-button ds-button--ghost action"}
                     onClick={() => handleToggleLike(post.id)}
                     disabled={!activeProfile}
                   >
@@ -795,14 +795,14 @@ function App() {
                   </button>
                   <button
                     type="button"
-                    className="action"
+                    className="ds-button ds-button--ghost action"
                     onClick={() => setExpandedPostId(expandedPostId === post.id ? null : post.id)}
                   >
                     Comment · {metrics.comments}
                   </button>
                   <button
                     type="button"
-                    className="action"
+                    className="ds-button ds-button--ghost action"
                     onClick={() => handleShare(post.id)}
                     disabled={!activeProfile}
                   >
@@ -812,12 +812,12 @@ function App() {
 
                 {canManagePost ? (
                   <div className="action-row compact">
-                    <button type="button" className="ghost" onClick={() => handleStartPostEdit(post)}>
+                    <button type="button" className="ds-button ds-button--ghost ghost" onClick={() => handleStartPostEdit(post)}>
                       Edit Post
                     </button>
                     <button
                       type="button"
-                      className="danger"
+                      className="ds-button ds-button--danger danger"
                       onClick={async () => {
                         if (!window.confirm("Delete this post and all comments/likes/shares?")) {
                           return;
@@ -850,12 +850,12 @@ function App() {
                                 onChange={(event) => setCommentEditDraft(event.target.value)}
                               />
                               <div className="action-row compact">
-                                <button type="button" className="solid" onClick={saveCommentEdit}>
+                                <button type="button" className="ds-button ds-button--primary solid" onClick={saveCommentEdit}>
                                   Save
                                 </button>
                                 <button
                                   type="button"
-                                  className="ghost"
+                                  className="ds-button ds-button--ghost ghost"
                                   onClick={() => {
                                     setEditingCommentId(null);
                                     setCommentEditDraft("");
@@ -873,14 +873,14 @@ function App() {
                             <div className="action-row compact">
                               <button
                                 type="button"
-                                className="ghost"
+                                className="ds-button ds-button--ghost ghost"
                                 onClick={() => beginCommentEdit(comment)}
                               >
                                 Edit
                               </button>
                               <button
                                 type="button"
-                                className="danger"
+                                className="ds-button ds-button--danger danger"
                                 onClick={async () => {
                                   if (!window.confirm("Delete this comment?")) {
                                     return;
@@ -909,7 +909,7 @@ function App() {
                       />
                       <button
                         type="button"
-                        className="solid"
+                        className="ds-button ds-button--primary solid"
                         disabled={!activeProfile}
                         onClick={() => handleCommentSubmit(post.id)}
                       >
@@ -925,7 +925,7 @@ function App() {
       </main>
 
       <aside className="column right-column">
-        <section className="card">
+        <section className="ds-card card">
           <p className="section-title">Trending</p>
           {trendingTopics.length === 0 ? <p className="muted">No trends yet.</p> : null}
           <div className="trend-list">
@@ -938,7 +938,7 @@ function App() {
           </div>
         </section>
 
-        <section className="card">
+        <section className="ds-card card">
           <p className="section-title">People</p>
           <div className="profile-list">
             {profiles.map((profile) => (
@@ -950,15 +950,15 @@ function App() {
                 <div className="profile-actions">
                   <button
                     type="button"
-                    className="ghost"
+                    className="ds-button ds-button--ghost ghost"
                     onClick={() => setSelectedProfileId(profile.id)}
                   >
                     Switch
                   </button>
-                  <button type="button" className="ghost" onClick={() => openProfileEditor(profile)}>
+                  <button type="button" className="ds-button ds-button--ghost ghost" onClick={() => openProfileEditor(profile)}>
                     Edit
                   </button>
-                  <button type="button" className="danger" onClick={() => void deleteProfile(profile.id)}>
+                  <button type="button" className="ds-button ds-button--danger danger" onClick={() => void deleteProfile(profile.id)}>
                     Delete
                   </button>
                 </div>
@@ -967,7 +967,7 @@ function App() {
           </div>
         </section>
 
-        <section className="card">
+        <section className="ds-card card">
           <p className="section-title">Recent Activity</p>
           <div className="recent-list">
             {(overview?.recentPosts ?? []).map((post) => (
@@ -1056,12 +1056,12 @@ function App() {
               </label>
 
               <div className="modal-actions">
-                <button type="submit" className="solid">
+                <button type="submit" className="ds-button ds-button--primary solid">
                   Save
                 </button>
                 <button
                   type="button"
-                  className="ghost"
+                  className="ds-button ds-button--ghost ghost"
                   onClick={() => {
                     setProfileModalOpen(false);
                     setEditingProfileId(null);
