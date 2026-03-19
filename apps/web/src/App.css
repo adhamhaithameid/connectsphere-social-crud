@@ -32,6 +32,17 @@
   gap: 12px;
 }
 
+.x-left-inner::-webkit-scrollbar,
+.x-right-inner::-webkit-scrollbar {
+  width: 8px;
+}
+
+.x-left-inner::-webkit-scrollbar-thumb,
+.x-right-inner::-webkit-scrollbar-thumb {
+  background: #2a3147;
+  border-radius: 999px;
+}
+
 .x-main-column {
   border-left: 1px solid #2a3147;
   border-right: 1px solid #2a3147;
