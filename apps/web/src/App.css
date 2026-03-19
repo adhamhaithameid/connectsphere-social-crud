@@ -235,7 +235,7 @@
   color: #8a94ad;
   font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
   font-weight: 700;
 }
 
@@ -243,6 +243,7 @@
   margin: 0 0 12px;
   color: #eef3ff;
   font-size: 20px;
+  line-height: 1.2;
   font-weight: 800;
 }
 
