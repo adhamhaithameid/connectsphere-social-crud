@@ -48,7 +48,8 @@ export const postUpdateSchema = postCreateSchema
 
 export const postListQuerySchema = listQuerySchema.extend({
   authorId: z.string().uuid().optional(),
-  visibility: z.enum(visibilityValues).optional()
+  visibility: z.enum(visibilityValues).optional(),
+  sort: z.enum(["recent", "popular"]).optional()
 });
 
 export const interactionCreateSchema = z

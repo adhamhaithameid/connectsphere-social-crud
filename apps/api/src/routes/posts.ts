@@ -8,10 +8,20 @@ export const postsRouter = Router();
 postsRouter.get(
   "/",
   asyncHandler(async (req, res) => {
-    const { q, limit = 20, page = 1, authorId, visibility } = postListQuerySchema.parse(req.query);
+    const { q, limit = 20, page = 1, authorId, visibility, sort = "recent" } =
+      postListQuerySchema.parse(req.query);
     const needle = q?.toLowerCase();
 
     const db = await readDatabase();
+    const interactionCountByPost = new Map<string, number>();
+
+    db.interactions.forEach((interaction) => {
+      interactionCountByPost.set(
+        interaction.postId,
+        (interactionCountByPost.get(interaction.postId) ?? 0) + 1
+      );
+    });
+
     const filtered = db.posts
       .filter((post) => {
         if (authorId && post.authorId !== authorId) {
@@ -31,7 +41,18 @@ postsRouter.get(
 
         return [post.content, authorName].join(" ").toLowerCase().includes(needle);
       })
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      .sort((a, b) => {
+        if (sort === "popular") {
+          const scoreA = interactionCountByPost.get(a.id) ?? 0;
+          const scoreB = interactionCountByPost.get(b.id) ?? 0;
+
+          if (scoreA !== scoreB) {
+            return scoreB - scoreA;
+          }
+        }
+
+        return b.createdAt.localeCompare(a.createdAt);
+      });
 
     const total = filtered.length;
     const start = (page - 1) * limit;
@@ -49,7 +70,7 @@ postsRouter.get(
             }
           : undefined,
         _count: {
-          interactions: db.interactions.filter((interaction) => interaction.postId === post.id).length
+          interactions: interactionCountByPost.get(post.id) ?? 0
         }
       };
     });
