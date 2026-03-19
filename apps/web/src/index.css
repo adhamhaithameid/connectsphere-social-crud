@@ -1,5 +1,41 @@
-@import "./styles/design-system.css";
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
+html,
+body,
 #root {
-  min-height: 100vh;
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #0b1020;
+  color: #eef3ff;
+  font-family:
+    "TwitterChirp",
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
 }
