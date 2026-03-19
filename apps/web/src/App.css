@@ -453,6 +453,10 @@
   cursor: pointer;
 }
 
+.x-input::placeholder {
+  color: #7583a4;
+}
+
 .x-input:focus,
 .x-select:focus,
 .x-composer-form textarea:focus,
