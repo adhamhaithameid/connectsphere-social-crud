@@ -27,6 +27,11 @@
   overflow-y: auto;
 }
 
+.x-right-inner {
+  display: grid;
+  gap: 12px;
+}
+
 .x-main-column {
   border-left: 1px solid #2a3147;
   border-right: 1px solid #2a3147;
@@ -677,7 +682,7 @@
   top: 0;
   z-index: 30;
   background: transparent;
-  padding: 4px 0 12px;
+  padding: 4px 0 0;
 }
 
 .x-search-card .x-input {
@@ -698,6 +703,7 @@
 
 .x-trend-list article,
 .x-recent-list article {
+  border: 1px solid #2a3147;
   border-radius: 10px;
   padding: 10px;
   display: grid;
@@ -711,6 +717,7 @@
 }
 
 .x-profile-row {
+  border: 1px solid #2a3147;
   border-radius: 10px;
   padding: 10px;
   display: grid;
