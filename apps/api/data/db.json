@@ -1,0 +1,96 @@
+{
+  "profiles": [
+    {
+      "id": "3f3776de-e784-447c-a0c7-5541015ec5c9",
+      "username": "nora.codes",
+      "displayName": "Nora Abdellah",
+      "bio": "Frontend engineer building delightful products.",
+      "location": "Cairo, Egypt",
+      "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+      "createdAt": "2026-03-19T18:56:09.438Z",
+      "updatedAt": "2026-03-19T18:56:09.438Z"
+    },
+    {
+      "id": "d156efea-20d7-46c1-8e22-230a96f29eab",
+      "username": "sam.dev",
+      "displayName": "Samir Aziz",
+      "bio": "Full-stack builder and coffee enthusiast.",
+      "location": "Alexandria, Egypt",
+      "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+      "createdAt": "2026-03-19T18:56:09.438Z",
+      "updatedAt": "2026-03-19T18:56:09.438Z"
+    },
+    {
+      "id": "88198f19-fe2e-4d9f-83ae-d71096d60181",
+      "username": "lina.pm",
+      "displayName": "Lina Mostafa",
+      "bio": "Product manager focused on social impact apps.",
+      "location": "Giza, Egypt",
+      "avatarUrl": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f",
+      "createdAt": "2026-03-19T18:56:09.438Z",
+      "updatedAt": "2026-03-19T18:56:09.438Z"
+    }
+  ],
+  "posts": [
+    {
+      "id": "1bbdb8b0-1238-4671-a824-b791a740ac0d",
+      "authorId": "3f3776de-e784-447c-a0c7-5541015ec5c9",
+      "content": "Shipped a new accessibility update today. Small details, big impact.",
+      "visibility": "PUBLIC",
+      "createdAt": "2026-03-19T18:56:09.438Z",
+      "updatedAt": "2026-03-19T18:56:09.438Z"
+    },
+    {
+      "id": "a5be89c1-e550-4ecf-81f3-8a60537989b0",
+      "authorId": "d156efea-20d7-46c1-8e22-230a96f29eab",
+      "content": "Building a CRUD API is still one of the best ways to master backend fundamentals.",
+      "visibility": "PUBLIC",
+      "createdAt": "2026-03-19T18:56:09.438Z",
+      "updatedAt": "2026-03-19T18:56:09.438Z"
+    },
+    {
+      "id": "260fddbc-c25b-4720-8091-62b7048c89c0",
+      "authorId": "88198f19-fe2e-4d9f-83ae-d71096d60181",
+      "content": "Team syncs are better when every voice gets heard.",
+      "visibility": "FRIENDS",
+      "createdAt": "2026-03-19T18:56:09.438Z",
+      "updatedAt": "2026-03-19T18:56:09.438Z"
+    }
+  ],
+  "interactions": [
+    {
+      "id": "7c5511f5-cb93-4787-86a8-4583524c6ee3",
+      "type": "LIKE",
+      "postId": "1bbdb8b0-1238-4671-a824-b791a740ac0d",
+      "authorId": "d156efea-20d7-46c1-8e22-230a96f29eab",
+      "createdAt": "2026-03-19T18:56:09.438Z",
+      "updatedAt": "2026-03-19T18:56:09.438Z"
+    },
+    {
+      "id": "90de2f49-5627-4c33-999c-d82e8f2a8e7c",
+      "type": "COMMENT",
+      "postId": "1bbdb8b0-1238-4671-a824-b791a740ac0d",
+      "authorId": "88198f19-fe2e-4d9f-83ae-d71096d60181",
+      "content": "Love this. Accessibility should be a default, not an afterthought.",
+      "createdAt": "2026-03-19T18:56:09.438Z",
+      "updatedAt": "2026-03-19T18:56:09.438Z"
+    },
+    {
+      "id": "884d7d15-58ae-4584-a449-f31981eb9d7f",
+      "type": "SHARE",
+      "postId": "a5be89c1-e550-4ecf-81f3-8a60537989b0",
+      "authorId": "3f3776de-e784-447c-a0c7-5541015ec5c9",
+      "createdAt": "2026-03-19T18:56:09.438Z",
+      "updatedAt": "2026-03-19T18:56:09.438Z"
+    },
+    {
+      "id": "5a639a7e-6719-465e-8089-c292907c9105",
+      "type": "COMMENT",
+      "postId": "260fddbc-c25b-4720-8091-62b7048c89c0",
+      "authorId": "d156efea-20d7-46c1-8e22-230a96f29eab",
+      "content": "Completely agree. Better product outcomes every time.",
+      "createdAt": "2026-03-19T18:56:09.438Z",
+      "updatedAt": "2026-03-19T18:56:09.438Z"
+    }
+  ]
+}
