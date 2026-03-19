@@ -17,6 +17,16 @@ const visibilityOptions: Visibility[] = ["PUBLIC", "FRIENDS", "PRIVATE"];
 const EMPTY_PROFILES: Profile[] = [];
 const EMPTY_POSTS: Post[] = [];
 const EMPTY_INTERACTIONS: Interaction[] = [];
+const xNavItems = [
+  { label: "Stream", icon: "S" },
+  { label: "Discover", icon: "D" },
+  { label: "Alerts", icon: "A" },
+  { label: "Messages", icon: "M" },
+  { label: "Groups", icon: "G" },
+  { label: "Saved", icon: "V" },
+  { label: "Profile", icon: "P" },
+  { label: "Settings", icon: "T" }
+] as const;
 
 interface ProfileDraft {
   username: string;
@@ -524,471 +534,547 @@ function App() {
   };
 
   return (
-    <div className="social-shell">
-      <aside className="column left-column">
-        <section className="ds-card card brand-card">
-          <p className="brand-mark">ConnectSphere</p>
-          <h1>Social HQ</h1>
-          <p className="muted">A real timeline-style social platform for your internship showcase.</p>
-        </section>
+    <div className="x-app">
+      <div className="x-shell">
+        <aside className="x-left-column">
+          <div className="x-left-inner">
+            <button type="button" className="x-logo-button" aria-label="Orbit Home">
+              O
+            </button>
 
-        <section className="ds-card card active-profile-card">
-          <p className="section-title">Active User</p>
-          {activeProfile ? (
-            <>
-              <div className="identity-row">
-                <div className="avatar">
-                  {activeProfile.avatarUrl ? (
-                    <img src={activeProfile.avatarUrl} alt={activeProfile.displayName} />
-                  ) : (
-                    <span>{initials(activeProfile.displayName)}</span>
-                  )}
-                </div>
-                <div>
-                  <p className="name">{activeProfile.displayName}</p>
-                  <p className="handle">@{activeProfile.username}</p>
-                </div>
-              </div>
+            <section className="x-brand-card">
+              <p className="x-brand-kicker">Orbit Social</p>
+              <p className="x-brand-copy">Share ideas, build communities, and keep your circle in sync.</p>
+            </section>
 
-              <select
-                value={activeProfileId}
-                onChange={(event) => setSelectedProfileId(event.target.value)}
-              >
-                {profiles.map((profile) => (
-                  <option key={profile.id} value={profile.id}>
-                    {profile.displayName}
-                  </option>
-                ))}
-              </select>
-            </>
-          ) : (
-            <p className="muted">Create your first profile to start posting.</p>
-          )}
+            <nav className="x-nav">
+              {xNavItems.map((item, index) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  className={index === 0 ? "x-nav-item active" : "x-nav-item"}
+                >
+                  <span className="x-nav-icon" aria-hidden="true">
+                    {item.icon}
+                  </span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </nav>
 
-          <button type="button" className="ds-button ds-button--primary solid" onClick={openProfileCreator}>
-            Create Profile
-          </button>
-        </section>
-
-        <section className="ds-card card metrics-card">
-          <p className="section-title">Network Snapshot</p>
-          <div className="metric-grid">
-            <article>
-              <strong>{overview?.totals.profiles ?? 0}</strong>
-              <span>Profiles</span>
-            </article>
-            <article>
-              <strong>{overview?.totals.posts ?? 0}</strong>
-              <span>Posts</span>
-            </article>
-            <article>
-              <strong>{overview?.totals.interactions ?? 0}</strong>
-              <span>Interactions</span>
-            </article>
-          </div>
-        </section>
-      </aside>
-
-      <main className="column center-column">
-        <section className="ds-card card search-card">
-          <div className="feed-mode-tabs">
             <button
               type="button"
-              className={feedMode === "recent" ? "ds-button tab active" : "ds-button tab"}
-              onClick={() => setFeedMode("recent")}
+              className="x-primary-button x-primary-button--wide"
+              disabled={!activeProfile}
+              onClick={() => {
+                document.getElementById("composer")?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start"
+                });
+              }}
             >
-              Recent
+              Create
             </button>
-            <button
-              type="button"
-              className={feedMode === "popular" ? "ds-button tab active" : "ds-button tab"}
-              onClick={() => setFeedMode("popular")}
-            >
-              Popular
-            </button>
-          </div>
-          <input
-            value={feedSearch}
-            onChange={(event) => setFeedSearch(event.target.value)}
-            placeholder="Search timeline by text or author"
-          />
-        </section>
 
-        <section className="ds-card card composer-card">
-          <p className="section-title">Compose Post</p>
-          <form onSubmit={handlePublishPost} className="composer-form">
-            <textarea
-              rows={4}
-              value={composerDraft.content}
-              onChange={(event) =>
-                setComposerDraft((previous) => ({
-                  ...previous,
-                  content: event.target.value
-                }))
-              }
-              placeholder="What is happening right now?"
-            />
-            <p className={remainingComposerChars < 60 ? "char-hint warning" : "char-hint"}>
-              {remainingComposerChars} characters remaining
-            </p>
-
-            <div className="composer-row">
-              <input
-                value={composerDraft.imageUrl}
-                onChange={(event) =>
-                  setComposerDraft((previous) => ({
-                    ...previous,
-                    imageUrl: event.target.value
-                  }))
-                }
-                placeholder="Optional image URL"
-              />
-              <select
-                value={composerDraft.visibility}
-                onChange={(event) =>
-                  setComposerDraft((previous) => ({
-                    ...previous,
-                    visibility: event.target.value as Visibility
-                  }))
-                }
-              >
-                {visibilityOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <button
-              type="submit"
-              className="ds-button ds-button--primary solid"
-              disabled={!activeProfile || !composerDraft.content.trim() || remainingComposerChars < 0}
-            >
-              Publish
-            </button>
-          </form>
-        </section>
-
-        {globalError ? <p className="error-banner">{globalError}</p> : null}
-
-        <section className="timeline-list">
-          {postsQuery.isLoading ? <p className="muted">Loading timeline...</p> : null}
-          {!postsQuery.isLoading && posts.length === 0 ? (
-            <article className="ds-card card post-card">
-              <p className="name">No posts found</p>
-              <p className="muted">
-                Try another search term or publish the first post from your active profile.
-              </p>
-            </article>
-          ) : null}
-
-          {posts.map((post) => {
-            const author = profileMap.get(post.authorId);
-            const metrics = interactionMetricsByPost.get(post.id) ?? {
-              likes: 0,
-              comments: 0,
-              shares: 0
-            };
-
-            const comments = (interactionsByPost.get(post.id) ?? []).filter(
-              (interaction) => interaction.type === "COMMENT"
-            );
-
-            const likedByActive = activeProfile
-              ? likeByPostAndAuthor.has(`${post.id}:${activeProfile.id}`)
-              : false;
-
-            const canManagePost = activeProfile?.id === post.authorId;
-
-            return (
-              <article key={post.id} className="ds-card card post-card">
-                <div className="post-head">
-                  <div className="identity-row">
-                    <div className="avatar small">
-                      {author?.avatarUrl ? (
-                        <img src={author.avatarUrl} alt={author.displayName} />
+            <section className="x-panel x-account-panel">
+              <p className="x-panel-kicker">Active account</p>
+              {activeProfile ? (
+                <>
+                  <div className="x-user-row">
+                    <div className="x-avatar">
+                      {activeProfile.avatarUrl ? (
+                        <img src={activeProfile.avatarUrl} alt={activeProfile.displayName} />
                       ) : (
-                        <span>{initials(author?.displayName ?? "User")}</span>
+                        <span>{initials(activeProfile.displayName)}</span>
                       )}
                     </div>
                     <div>
-                      <p className="name">{author?.displayName ?? "Deleted user"}</p>
-                      <p className="handle">
-                        @{author?.username ?? "unknown"} · {timeAgo(post.createdAt)}
-                      </p>
+                      <p className="x-user-name">{activeProfile.displayName}</p>
+                      <p className="x-user-handle">@{activeProfile.username}</p>
                     </div>
                   </div>
 
-                  <span className="visibility-pill">{post.visibility}</span>
+                  <select
+                    className="x-select"
+                    value={activeProfileId}
+                    onChange={(event) => setSelectedProfileId(event.target.value)}
+                  >
+                    {profiles.map((profile) => (
+                      <option key={profile.id} value={profile.id}>
+                        {profile.displayName}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              ) : (
+                <p className="x-muted">Create a profile to start posting.</p>
+              )}
+
+              <button type="button" className="x-outline-button" onClick={openProfileCreator}>
+                Create Profile
+              </button>
+            </section>
+
+            <section className="x-panel x-metrics-panel">
+              <p className="x-panel-kicker">Network</p>
+              <div className="x-metrics-grid">
+                <article>
+                  <strong>{overview?.totals.profiles ?? 0}</strong>
+                  <span>Profiles</span>
+                </article>
+                <article>
+                  <strong>{overview?.totals.posts ?? 0}</strong>
+                  <span>Posts</span>
+                </article>
+                <article>
+                  <strong>{overview?.totals.interactions ?? 0}</strong>
+                  <span>Interactions</span>
+                </article>
+              </div>
+            </section>
+          </div>
+        </aside>
+
+        <main className="x-main-column">
+          <header className="x-main-header">
+            <h1>Stream</h1>
+          </header>
+
+          <section className="x-feed-mode-tabs">
+            <button
+              type="button"
+              className={feedMode === "recent" ? "x-feed-tab active" : "x-feed-tab"}
+              onClick={() => setFeedMode("recent")}
+            >
+              Latest
+            </button>
+            <button
+              type="button"
+              className={feedMode === "popular" ? "x-feed-tab active" : "x-feed-tab"}
+              onClick={() => setFeedMode("popular")}
+            >
+              Top
+            </button>
+          </section>
+
+          <section className="x-inline-search">
+            <input
+              className="x-input"
+              value={feedSearch}
+              onChange={(event) => setFeedSearch(event.target.value)}
+              placeholder="Search posts or people"
+            />
+          </section>
+
+          <section id="composer" className="x-composer">
+            <div className="x-avatar">
+              {activeProfile?.avatarUrl ? (
+                <img src={activeProfile.avatarUrl} alt={activeProfile.displayName} />
+              ) : (
+                <span>{activeProfile ? initials(activeProfile.displayName) : "?"}</span>
+              )}
+            </div>
+
+            <form onSubmit={handlePublishPost} className="x-composer-form">
+              <textarea
+                rows={3}
+                value={composerDraft.content}
+                onChange={(event) =>
+                  setComposerDraft((previous) => ({
+                    ...previous,
+                    content: event.target.value
+                  }))
+                }
+                placeholder="Share an update with your community..."
+              />
+
+              <div className="x-composer-footer">
+                <div className="x-composer-fields">
+                  <input
+                    className="x-input"
+                    value={composerDraft.imageUrl}
+                    onChange={(event) =>
+                      setComposerDraft((previous) => ({
+                        ...previous,
+                        imageUrl: event.target.value
+                      }))
+                    }
+                    placeholder="Optional image URL"
+                  />
+
+                  <select
+                    className="x-select"
+                    value={composerDraft.visibility}
+                    onChange={(event) =>
+                      setComposerDraft((previous) => ({
+                        ...previous,
+                        visibility: event.target.value as Visibility
+                      }))
+                    }
+                  >
+                    {visibilityOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
-                {editingPostId === post.id ? (
-                  <div className="edit-box">
-                    <textarea
-                      rows={4}
-                      value={postEditDraft.content}
-                      onChange={(event) =>
-                        setPostEditDraft((previous) => ({
-                          ...previous,
-                          content: event.target.value
-                        }))
-                      }
-                    />
-                    <div className="composer-row">
-                      <input
-                        value={postEditDraft.imageUrl}
-                        onChange={(event) =>
-                          setPostEditDraft((previous) => ({
-                            ...previous,
-                            imageUrl: event.target.value
-                          }))
-                        }
-                        placeholder="Optional image URL"
-                      />
-                      <select
-                        value={postEditDraft.visibility}
-                        onChange={(event) =>
-                          setPostEditDraft((previous) => ({
-                            ...previous,
-                            visibility: event.target.value as Visibility
-                          }))
-                        }
-                      >
-                        {visibilityOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="action-row compact">
-                      <button type="button" className="ds-button ds-button--primary solid" onClick={handlePostSave}>
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        className="ds-button ds-button--ghost ghost"
-                        onClick={() => setEditingPostId(null)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <p className="post-text">{post.content}</p>
-                    {post.imageUrl ? (
-                      <img src={post.imageUrl} alt="Post attachment" className="post-media" />
-                    ) : null}
-                  </>
-                )}
-
-                <div className="action-row">
+                <div className="x-composer-actions">
+                  <p className={remainingComposerChars < 60 ? "x-char-hint warning" : "x-char-hint"}>
+                    {remainingComposerChars}
+                  </p>
                   <button
-                    type="button"
-                    className={likedByActive ? "ds-button ds-button--ghost action liked" : "ds-button ds-button--ghost action"}
-                    onClick={() => handleToggleLike(post.id)}
-                    disabled={!activeProfile}
+                    type="submit"
+                    className="x-primary-button"
+                    disabled={!activeProfile || !composerDraft.content.trim() || remainingComposerChars < 0}
                   >
-                    Like · {metrics.likes}
-                  </button>
-                  <button
-                    type="button"
-                    className="ds-button ds-button--ghost action"
-                    onClick={() => setExpandedPostId(expandedPostId === post.id ? null : post.id)}
-                  >
-                    Comment · {metrics.comments}
-                  </button>
-                  <button
-                    type="button"
-                    className="ds-button ds-button--ghost action"
-                    onClick={() => handleShare(post.id)}
-                    disabled={!activeProfile}
-                  >
-                    Share · {metrics.shares}
+                    Share
                   </button>
                 </div>
+              </div>
+            </form>
+          </section>
 
-                {canManagePost ? (
-                  <div className="action-row compact">
-                    <button type="button" className="ds-button ds-button--ghost ghost" onClick={() => handleStartPostEdit(post)}>
-                      Edit Post
-                    </button>
-                    <button
-                      type="button"
-                      className="ds-button ds-button--danger danger"
-                      onClick={async () => {
-                        if (!window.confirm("Delete this post and all comments/likes/shares?")) {
-                          return;
-                        }
-                        await postDeleteMutation.mutateAsync(post.id);
-                      }}
-                    >
-                      Delete Post
-                    </button>
+          {globalError ? <p className="x-error-banner">{globalError}</p> : null}
+
+          <section className="x-timeline">
+            {postsQuery.isLoading ? <p className="x-muted x-state">Loading timeline...</p> : null}
+            {!postsQuery.isLoading && posts.length === 0 ? (
+              <article className="x-empty-state">
+                <p className="x-user-name">No posts found</p>
+                <p className="x-muted">Try another search or publish the first post.</p>
+              </article>
+            ) : null}
+
+            {posts.map((post) => {
+              const author = profileMap.get(post.authorId);
+              const metrics = interactionMetricsByPost.get(post.id) ?? {
+                likes: 0,
+                comments: 0,
+                shares: 0
+              };
+              const comments = (interactionsByPost.get(post.id) ?? []).filter(
+                (interaction) => interaction.type === "COMMENT"
+              );
+              const likedByActive = activeProfile
+                ? likeByPostAndAuthor.has(`${post.id}:${activeProfile.id}`)
+                : false;
+              const canManagePost = activeProfile?.id === post.authorId;
+
+              return (
+                <article key={post.id} className="x-post">
+                  <div className="x-avatar small">
+                    {author?.avatarUrl ? (
+                      <img src={author.avatarUrl} alt={author.displayName} />
+                    ) : (
+                      <span>{initials(author?.displayName ?? "User")}</span>
+                    )}
                   </div>
-                ) : null}
 
-                {expandedPostId === post.id || comments.length > 0 ? (
-                  <div className="comments-zone">
-                    {comments.map((comment) => {
-                      const commentAuthor = profileMap.get(comment.authorId);
-                      const canManageComment = activeProfile?.id === comment.authorId;
+                  <div className="x-post-body">
+                    <header className="x-post-header">
+                      <div>
+                        <p className="x-user-name">{author?.displayName ?? "Deleted user"}</p>
+                        <p className="x-user-handle">
+                          @{author?.username ?? "unknown"} · {timeAgo(post.createdAt)}
+                        </p>
+                      </div>
+                      <span className="x-visibility-pill">{post.visibility}</span>
+                    </header>
 
-                      return (
-                        <article key={comment.id} className="comment-item">
-                          <p className="comment-meta">
-                            <strong>{commentAuthor?.displayName ?? "Unknown"}</strong> · {formatDate(comment.createdAt)}
-                          </p>
+                    {editingPostId === post.id ? (
+                      <div className="x-edit-box">
+                        <textarea
+                          rows={4}
+                          value={postEditDraft.content}
+                          onChange={(event) =>
+                            setPostEditDraft((previous) => ({
+                              ...previous,
+                              content: event.target.value
+                            }))
+                          }
+                        />
 
-                          {editingCommentId === comment.id ? (
-                            <>
-                              <textarea
-                                rows={3}
-                                value={commentEditDraft}
-                                onChange={(event) => setCommentEditDraft(event.target.value)}
-                              />
-                              <div className="action-row compact">
-                                <button type="button" className="ds-button ds-button--primary solid" onClick={saveCommentEdit}>
-                                  Save
-                                </button>
-                                <button
-                                  type="button"
-                                  className="ds-button ds-button--ghost ghost"
-                                  onClick={() => {
-                                    setEditingCommentId(null);
-                                    setCommentEditDraft("");
-                                  }}
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            </>
-                          ) : (
-                            <p>{comment.content}</p>
-                          )}
+                        <div className="x-inline-row">
+                          <input
+                            className="x-input"
+                            value={postEditDraft.imageUrl}
+                            onChange={(event) =>
+                              setPostEditDraft((previous) => ({
+                                ...previous,
+                                imageUrl: event.target.value
+                              }))
+                            }
+                            placeholder="Optional image URL"
+                          />
+                          <select
+                            className="x-select"
+                            value={postEditDraft.visibility}
+                            onChange={(event) =>
+                              setPostEditDraft((previous) => ({
+                                ...previous,
+                                visibility: event.target.value as Visibility
+                              }))
+                            }
+                          >
+                            {visibilityOptions.map((option) => (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
 
-                          {canManageComment && editingCommentId !== comment.id ? (
-                            <div className="action-row compact">
-                              <button
-                                type="button"
-                                className="ds-button ds-button--ghost ghost"
-                                onClick={() => beginCommentEdit(comment)}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                type="button"
-                                className="ds-button ds-button--danger danger"
-                                onClick={async () => {
-                                  if (!window.confirm("Delete this comment?")) {
-                                    return;
-                                  }
-                                  await interactionDeleteMutation.mutateAsync(comment.id);
-                                }}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          ) : null}
-                        </article>
-                      );
-                    })}
+                        <div className="x-inline-actions">
+                          <button type="button" className="x-primary-button" onClick={handlePostSave}>
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            className="x-outline-button"
+                            onClick={() => setEditingPostId(null)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="x-post-text">{post.content}</p>
+                        {post.imageUrl ? (
+                          <img src={post.imageUrl} alt="Post attachment" className="x-post-media" />
+                        ) : null}
+                      </>
+                    )}
 
-                    <div className="comment-compose">
-                      <input
-                        value={commentDrafts[post.id] ?? ""}
-                        onChange={(event) =>
-                          setCommentDrafts((previous) => ({
-                            ...previous,
-                            [post.id]: event.target.value
-                          }))
-                        }
-                        placeholder="Write a comment"
-                      />
+                    <div className="x-post-actions">
                       <button
                         type="button"
-                        className="ds-button ds-button--primary solid"
+                        className={likedByActive ? "x-action-button liked" : "x-action-button"}
+                        onClick={() => handleToggleLike(post.id)}
                         disabled={!activeProfile}
-                        onClick={() => handleCommentSubmit(post.id)}
                       >
-                        Post
+                        <span className="x-action-label">Like</span>
+                        <span className="x-action-count">{metrics.likes}</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="x-action-button"
+                        onClick={() => setExpandedPostId(expandedPostId === post.id ? null : post.id)}
+                      >
+                        <span className="x-action-label">Comment</span>
+                        <span className="x-action-count">{metrics.comments}</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="x-action-button"
+                        onClick={() => handleShare(post.id)}
+                        disabled={!activeProfile}
+                      >
+                        <span className="x-action-label">Repost</span>
+                        <span className="x-action-count">{metrics.shares}</span>
                       </button>
                     </div>
+
+                    {canManagePost ? (
+                      <div className="x-inline-actions">
+                        <button type="button" className="x-outline-button" onClick={() => handleStartPostEdit(post)}>
+                          Edit Post
+                        </button>
+                        <button
+                          type="button"
+                          className="x-danger-button"
+                          onClick={async () => {
+                            if (!window.confirm("Delete this post and all comments/likes/shares?")) {
+                              return;
+                            }
+                            await postDeleteMutation.mutateAsync(post.id);
+                          }}
+                        >
+                          Delete Post
+                        </button>
+                      </div>
+                    ) : null}
+
+                    {expandedPostId === post.id || comments.length > 0 ? (
+                      <div className="x-comments-zone">
+                        {comments.map((comment) => {
+                          const commentAuthor = profileMap.get(comment.authorId);
+                          const canManageComment = activeProfile?.id === comment.authorId;
+
+                          return (
+                            <article key={comment.id} className="x-comment-item">
+                              <p className="x-comment-meta">
+                                <strong>{commentAuthor?.displayName ?? "Unknown"}</strong> · {formatDate(comment.createdAt)}
+                              </p>
+
+                              {editingCommentId === comment.id ? (
+                                <>
+                                  <textarea
+                                    rows={3}
+                                    value={commentEditDraft}
+                                    onChange={(event) => setCommentEditDraft(event.target.value)}
+                                  />
+                                  <div className="x-inline-actions">
+                                    <button type="button" className="x-primary-button" onClick={saveCommentEdit}>
+                                      Save
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="x-outline-button"
+                                      onClick={() => {
+                                        setEditingCommentId(null);
+                                        setCommentEditDraft("");
+                                      }}
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </>
+                              ) : (
+                                <p className="x-comment-text">{comment.content}</p>
+                              )}
+
+                              {canManageComment && editingCommentId !== comment.id ? (
+                                <div className="x-inline-actions">
+                                  <button
+                                    type="button"
+                                    className="x-outline-button"
+                                    onClick={() => beginCommentEdit(comment)}
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="x-danger-button"
+                                    onClick={async () => {
+                                      if (!window.confirm("Delete this comment?")) {
+                                        return;
+                                      }
+                                      await interactionDeleteMutation.mutateAsync(comment.id);
+                                    }}
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              ) : null}
+                            </article>
+                          );
+                        })}
+
+                        <div className="x-comment-compose">
+                          <input
+                            className="x-input"
+                            value={commentDrafts[post.id] ?? ""}
+                            onChange={(event) =>
+                              setCommentDrafts((previous) => ({
+                                ...previous,
+                                [post.id]: event.target.value
+                              }))
+                            }
+                            placeholder="Write a reply"
+                          />
+                          <button
+                            type="button"
+                            className="x-primary-button"
+                            disabled={!activeProfile}
+                            onClick={() => handleCommentSubmit(post.id)}
+                          >
+                            Reply
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
-                ) : null}
-              </article>
-            );
-          })}
-        </section>
-      </main>
+                </article>
+              );
+            })}
+          </section>
+        </main>
 
-      <aside className="column right-column">
-        <section className="ds-card card">
-          <p className="section-title">Trending</p>
-          {trendingTopics.length === 0 ? <p className="muted">No trends yet.</p> : null}
-          <div className="trend-list">
-            {trendingTopics.map(([topic, score]) => (
-              <article key={topic}>
-                <p className="name">#{topic}</p>
-                <p className="muted">{score} mentions</p>
-              </article>
-            ))}
-          </div>
-        </section>
+        <aside className="x-right-column">
+          <div className="x-right-inner">
+            <section className="x-search-card">
+              <input
+                className="x-input"
+                value={feedSearch}
+                onChange={(event) => setFeedSearch(event.target.value)}
+                placeholder="Quick search"
+              />
+            </section>
 
-        <section className="ds-card card">
-          <p className="section-title">People</p>
-          <div className="profile-list">
-            {profiles.map((profile) => (
-              <article key={profile.id} className="profile-row">
-                <div>
-                  <p className="name">{profile.displayName}</p>
-                  <p className="handle">@{profile.username}</p>
-                </div>
-                <div className="profile-actions">
-                  <button
-                    type="button"
-                    className="ds-button ds-button--ghost ghost"
-                    onClick={() => setSelectedProfileId(profile.id)}
-                  >
-                    Switch
-                  </button>
-                  <button type="button" className="ds-button ds-button--ghost ghost" onClick={() => openProfileEditor(profile)}>
-                    Edit
-                  </button>
-                  <button type="button" className="ds-button ds-button--danger danger" onClick={() => void deleteProfile(profile.id)}>
-                    Delete
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+            <section className="x-panel">
+              <h2 className="x-panel-title">Topics bubbling up</h2>
+              {trendingTopics.length === 0 ? <p className="x-muted">No trends yet.</p> : null}
+              <div className="x-trend-list">
+                {trendingTopics.map(([topic, score]) => (
+                  <article key={topic}>
+                    <p className="x-user-name">#{topic}</p>
+                    <p className="x-muted">{score} posts</p>
+                  </article>
+                ))}
+              </div>
+            </section>
 
-        <section className="ds-card card">
-          <p className="section-title">Recent Activity</p>
-          <div className="recent-list">
-            {(overview?.recentPosts ?? []).map((post) => (
-              <article key={post.id}>
-                <p className="name">{post.author?.displayName ?? "Unknown"}</p>
-                <p className="muted">{post.content}</p>
-                <p className="handle">{post._count?.interactions ?? 0} interactions</p>
-              </article>
-            ))}
+            <section className="x-panel">
+              <h2 className="x-panel-title">Community</h2>
+              <div className="x-people-list">
+                {profiles.map((profile) => (
+                  <article key={profile.id} className="x-profile-row">
+                    <div className="x-profile-row-head">
+                      <p className="x-user-name">{profile.displayName}</p>
+                      <p className="x-user-handle">@{profile.username}</p>
+                    </div>
+                    <div className="x-profile-row-actions">
+                      <button
+                        type="button"
+                        className="x-outline-button"
+                        onClick={() => setSelectedProfileId(profile.id)}
+                      >
+                        Switch
+                      </button>
+                      <button type="button" className="x-outline-button" onClick={() => openProfileEditor(profile)}>
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        className="x-danger-button"
+                        onClick={() => void deleteProfile(profile.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="x-panel">
+              <h2 className="x-panel-title">Fresh activity</h2>
+              <div className="x-recent-list">
+                {(overview?.recentPosts ?? []).map((post) => (
+                  <article key={post.id}>
+                    <p className="x-user-name">{post.author?.displayName ?? "Unknown"}</p>
+                    <p className="x-muted">{post.content}</p>
+                    <p className="x-user-handle">{post._count?.interactions ?? 0} interactions</p>
+                  </article>
+                ))}
+              </div>
+            </section>
           </div>
-        </section>
-      </aside>
+        </aside>
+      </div>
 
       {profileModalOpen ? (
-        <div className="modal-backdrop">
-          <div className="modal-card">
+        <div className="x-modal-backdrop">
+          <div className="x-modal-card">
             <h2>{editingProfileId ? "Edit Profile" : "Create Profile"}</h2>
-            <form onSubmit={submitProfile} className="profile-form">
+            <form onSubmit={submitProfile} className="x-profile-form">
               <label>
                 Username
                 <input
+                  className="x-input"
                   value={profileDraft.username}
                   onChange={(event) =>
                     setProfileDraft((previous) => ({
@@ -1004,6 +1090,7 @@ function App() {
               <label>
                 Display Name
                 <input
+                  className="x-input"
                   value={profileDraft.displayName}
                   onChange={(event) =>
                     setProfileDraft((previous) => ({
@@ -1018,6 +1105,7 @@ function App() {
               <label>
                 Bio
                 <textarea
+                  className="x-textarea"
                   rows={3}
                   value={profileDraft.bio}
                   onChange={(event) =>
@@ -1032,6 +1120,7 @@ function App() {
               <label>
                 Avatar URL
                 <input
+                  className="x-input"
                   value={profileDraft.avatarUrl}
                   onChange={(event) =>
                     setProfileDraft((previous) => ({
@@ -1045,6 +1134,7 @@ function App() {
               <label>
                 Location
                 <input
+                  className="x-input"
                   value={profileDraft.location}
                   onChange={(event) =>
                     setProfileDraft((previous) => ({
@@ -1055,13 +1145,13 @@ function App() {
                 />
               </label>
 
-              <div className="modal-actions">
-                <button type="submit" className="ds-button ds-button--primary solid">
+              <div className="x-inline-actions x-modal-actions">
+                <button type="submit" className="x-primary-button">
                   Save
                 </button>
                 <button
                   type="button"
-                  className="ds-button ds-button--ghost ghost"
+                  className="x-outline-button"
                   onClick={() => {
                     setProfileModalOpen(false);
                     setEditingProfileId(null);
