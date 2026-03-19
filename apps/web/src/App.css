@@ -109,6 +109,11 @@
   border: 1px solid #2a3147;
 }
 
+.x-nav-item:focus-visible {
+  outline: 2px solid #47c2ff;
+  outline-offset: 2px;
+}
+
 .x-nav-icon {
   width: 28px;
   display: inline-flex;
@@ -183,6 +188,13 @@
 .x-danger-button:hover {
   background: #d91b27;
   border-color: #d91b27;
+}
+
+.x-primary-button:focus-visible,
+.x-outline-button:focus-visible,
+.x-danger-button:focus-visible {
+  outline: 2px solid #47c2ff;
+  outline-offset: 2px;
 }
 
 .x-panel {
