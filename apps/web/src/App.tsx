@@ -573,7 +573,7 @@ function App() {
                 });
               }}
             >
-              Create
+              New Post
             </button>
 
             <section className="x-panel x-account-panel">
@@ -611,7 +611,7 @@ function App() {
               )}
 
               <button type="button" className="x-outline-button" onClick={openProfileCreator}>
-                Create Profile
+                New Profile
               </button>
             </section>
 
@@ -1000,7 +1000,7 @@ function App() {
                 className="x-input"
                 value={feedSearch}
                 onChange={(event) => setFeedSearch(event.target.value)}
-                placeholder="Quick search"
+                placeholder="Search people, topics, or posts"
               />
             </section>
 
