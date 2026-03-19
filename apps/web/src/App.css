@@ -880,6 +880,16 @@
     grid-template-columns: 1fr;
   }
 
+  .x-post-actions {
+    justify-content: space-between;
+  }
+
+  .x-action-button {
+    flex: 1;
+    min-width: 0;
+    justify-content: space-between;
+  }
+
   .x-inline-actions button {
     flex: 1;
   }
