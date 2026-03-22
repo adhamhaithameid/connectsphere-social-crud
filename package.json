@@ -1,5 +1,5 @@
 {
-  "name": "social-media-crud-app",
+  "name": "connectsphere-social-crud",
   "private": true,
   "version": "1.0.0",
   "description": "Full-stack social media CRUD platform for internship portfolio",
@@ -8,8 +8,8 @@
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
-    "seed": "pnpm --filter @social/api seed",
-    "crud:smoke": "pnpm --filter @social/api crud:smoke"
+    "seed": "pnpm --filter @connectsphere/api seed",
+    "crud:smoke": "pnpm --filter @connectsphere/api crud:smoke"
   },
   "engines": {
     "node": ">=20"
