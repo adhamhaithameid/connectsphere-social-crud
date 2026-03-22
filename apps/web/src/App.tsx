@@ -446,8 +446,6 @@ function App() {
       <div className="x-shell">
         <Sidebar
           activeProfile={activeProfile}
-          profiles={profiles}
-          onSelectProfile={setSelectedProfileId}
           onOpenProfileCreator={openProfileCreator}
         />
 

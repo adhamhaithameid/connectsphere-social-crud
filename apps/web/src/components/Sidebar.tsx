@@ -16,8 +16,6 @@ import type { Profile } from "../types";
 
 interface SidebarProps {
   activeProfile: Profile | null;
-  profiles: Profile[];
-  onSelectProfile: (id: string) => void;
   onOpenProfileCreator: () => void;
 }
 
@@ -35,8 +33,6 @@ const navItems = [
 
 export default function Sidebar({
   activeProfile,
-  profiles,
-  onSelectProfile,
   onOpenProfileCreator,
 }: SidebarProps) {
   const location = useLocation();
@@ -56,7 +52,6 @@ export default function Sidebar({
             <circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
             <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="4 3" opacity="0.5" />
             <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-            <circle cx="12" cy="3" r="1.2" fill="currentColor" />
           </svg>
         </button>
 
