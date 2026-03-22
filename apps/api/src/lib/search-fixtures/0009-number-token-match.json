@@ -1,0 +1,7 @@
+{
+  "id": "0009",
+  "description": "keeps numeric tokens searchable",
+  "fields": ["Sprint 24 planning"],
+  "query": "24",
+  "expected": true
+}

@@ -1,0 +1,7 @@
+{
+  "id": "0152",
+  "description": "trims and collapses repeated whitespace in queries",
+  "fields": ["product roadmap checkpoint 0152"],
+  "query": "   roadmap   checkpoint   0152 ",
+  "expected": true
+}

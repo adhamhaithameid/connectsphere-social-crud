@@ -1,0 +1,7 @@
+{
+  "id": "0006",
+  "description": "treats empty query as match-all",
+  "fields": ["anything"],
+  "query": "",
+  "expected": true
+}

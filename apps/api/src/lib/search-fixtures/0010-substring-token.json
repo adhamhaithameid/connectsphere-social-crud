@@ -1,0 +1,7 @@
+{
+  "id": "0010",
+  "description": "matches token substrings inside normalized text",
+  "fields": ["interaction analytics"],
+  "query": "analyt",
+  "expected": true
+}

@@ -1,0 +1,7 @@
+{
+  "id": "0017",
+  "description": "keeps numeric identifiers searchable",
+  "fields": ["Sprint-0017 planning board"],
+  "query": "0017 planning",
+  "expected": true
+}

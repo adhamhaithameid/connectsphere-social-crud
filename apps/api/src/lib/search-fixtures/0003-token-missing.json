@@ -1,0 +1,7 @@
+{
+  "id": "0003",
+  "description": "fails when one query token is missing",
+  "fields": ["City update from downtown Cairo", "Mina"],
+  "query": "mina berlin",
+  "expected": false
+}

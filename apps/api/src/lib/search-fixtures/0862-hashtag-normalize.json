@@ -1,0 +1,7 @@
+{
+  "id": "0862",
+  "description": "matches hashtags after symbol normalization",
+  "fields": ["#Launch0862 campaign ready"],
+  "query": "#launch0862",
+  "expected": true
+}

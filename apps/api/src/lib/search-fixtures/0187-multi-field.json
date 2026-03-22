@@ -1,0 +1,7 @@
+{
+  "id": "0187",
+  "description": "matches when query tokens are distributed across fields",
+  "fields": ["weekly digest", "profile delta 0187", "from alex"],
+  "query": "alex 0187 digest",
+  "expected": true
+}

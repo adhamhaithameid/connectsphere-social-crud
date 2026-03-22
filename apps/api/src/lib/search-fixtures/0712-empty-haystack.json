@@ -1,0 +1,7 @@
+{
+  "id": "0712",
+  "description": "does not match non-empty query against empty fields",
+  "fields": [null, "", "   "],
+  "query": "signal 0712",
+  "expected": false
+}

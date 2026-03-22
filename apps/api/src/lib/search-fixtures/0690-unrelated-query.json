@@ -1,0 +1,7 @@
+{
+  "id": "0690",
+  "description": "fails when semantic tokens are unrelated",
+  "fields": ["Design system review 0690"],
+  "query": "backend migration 0690",
+  "expected": false
+}

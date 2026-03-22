@@ -1,0 +1,7 @@
+{
+  "id": "0609",
+  "description": "fails when one of multiple required tokens is absent",
+  "fields": ["interaction analytics snapshot 0609"],
+  "query": "analytics quantum 0609",
+  "expected": false
+}

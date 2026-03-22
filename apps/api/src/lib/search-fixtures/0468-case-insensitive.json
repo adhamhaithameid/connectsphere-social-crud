@@ -1,0 +1,7 @@
+{
+  "id": "0468",
+  "description": "matches case-insensitive tokens across author and topic",
+  "fields": ["Release note 0468 drafted by Nora", "Cairo squad"],
+  "query": "nora cairo 0468",
+  "expected": true
+}

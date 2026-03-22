@@ -1,0 +1,7 @@
+{
+  "id": "0375",
+  "description": "handles punctuation as token separators",
+  "fields": ["launch-day/0375: check-in @ noon"],
+  "query": "launch day 0375 noon",
+  "expected": true
+}

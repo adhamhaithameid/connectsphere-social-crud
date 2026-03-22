@@ -1,0 +1,7 @@
+{
+  "id": "0313",
+  "description": "fails when location token is missing",
+  "fields": ["Release note 0313 drafted by Nora", "Cairo squad"],
+  "query": "nora berlin 0313",
+  "expected": false
+}

@@ -1,0 +1,7 @@
+{
+  "id": "0719",
+  "description": "matches mentions after symbol normalization",
+  "fields": ["Thanks @User0719 for feedback"],
+  "query": "user0719 feedback",
+  "expected": true
+}

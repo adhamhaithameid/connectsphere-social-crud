@@ -1,0 +1,7 @@
+{
+  "id": "0001",
+  "description": "matches a lowercase token against mixed-case content",
+  "fields": ["Alice posted from Cairo"],
+  "query": "alice",
+  "expected": true
+}

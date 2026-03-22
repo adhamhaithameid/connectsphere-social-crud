@@ -1,0 +1,7 @@
+{
+  "id": "0278",
+  "description": "matches accented words after normalization",
+  "fields": ["Café meetup batch 0278"],
+  "query": "cafe 0278",
+  "expected": true
+}

@@ -1,0 +1,7 @@
+{
+  "id": "0007",
+  "description": "fails when haystack is empty and query is not",
+  "fields": [null, "", "   "],
+  "query": "signal",
+  "expected": false
+}

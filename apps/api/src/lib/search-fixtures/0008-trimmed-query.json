@@ -1,0 +1,7 @@
+{
+  "id": "0008",
+  "description": "trims and collapses repeated query whitespace",
+  "fields": ["weekly product review"],
+  "query": "   product      review   ",
+  "expected": true
+}
