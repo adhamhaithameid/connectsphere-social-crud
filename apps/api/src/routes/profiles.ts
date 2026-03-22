@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { asyncHandler, HttpError } from "../lib/http.js";
+import { matchesSearchQuery } from "../lib/search.js";
 import { createId, mutateDatabase, nowIso, readDatabase } from "../lib/store.js";
 import { listQuerySchema, profileCreateSchema, profileUpdateSchema } from "../lib/validators.js";
 
@@ -9,19 +10,11 @@ profilesRouter.get(
   "/",
   asyncHandler(async (req, res) => {
     const { q, limit = 20, page = 1 } = listQuerySchema.parse(req.query);
-    const needle = q?.toLowerCase();
 
     const db = await readDatabase();
     const filtered = db.profiles
       .filter((profile) => {
-        if (!needle) {
-          return true;
-        }
-
-        return [profile.username, profile.displayName, profile.bio ?? ""]
-          .join(" ")
-          .toLowerCase()
-          .includes(needle);
+        return matchesSearchQuery([profile.username, profile.displayName, profile.bio], q);
       })
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
