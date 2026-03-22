@@ -1,41 +1,97 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&family=IBM+Plex+Mono:wght@500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 
 :root {
-  --ds-font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
-  --ds-font-heading: "Manrope", "Segoe UI", sans-serif;
-  --ds-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  /* Font Families — clean system-first stack like X */
+  --ds-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --ds-font-heading: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --ds-font-mono: "SF Mono", "Cascadia Code", "Fira Code", ui-monospace, monospace;
 
-  --ds-color-bg-canvas: #eef5fb;
-  --ds-color-bg-surface: #ffffff;
-  --ds-color-bg-surface-soft: #f4f8fc;
-  --ds-color-bg-overlay: rgba(7, 27, 42, 0.66);
-  --ds-color-bg-brand: linear-gradient(145deg, #0e2940 0%, #0d5b8e 70%, #56a1cd 100%);
+  /* ─── Primary Brand — X Blue ─── */
+  --ds-color-primary-50: #e8f5fd;
+  --ds-color-primary-100: #cceafc;
+  --ds-color-primary-200: #8fd1f9;
+  --ds-color-primary-300: #52b9f5;
+  --ds-color-primary-400: #1da1f2;
+  --ds-color-primary-500: #1d9bf0;
+  --ds-color-primary-600: #1a8cd8;
+  --ds-color-primary-700: #1577b7;
+  --ds-color-primary-800: #0d5e94;
+  --ds-color-primary-900: #064570;
 
-  --ds-color-text-strong: #102b3f;
-  --ds-color-text: #1f435b;
-  --ds-color-text-muted: #5d7689;
-  --ds-color-text-inverse: #f1f9ff;
+  /* ─── Secondary — Violet accent ─── */
+  --ds-color-secondary-50: #f3f0ff;
+  --ds-color-secondary-100: #e9e0ff;
+  --ds-color-secondary-200: #d4c0ff;
+  --ds-color-secondary-300: #b899ff;
+  --ds-color-secondary-400: #9b72e8;
+  --ds-color-secondary-500: #7856ff;
+  --ds-color-secondary-600: #6344d4;
+  --ds-color-secondary-700: #4f34ab;
+  --ds-color-secondary-800: #3c2783;
 
-  --ds-color-border-subtle: #d8e4ee;
-  --ds-color-border-strong: #c3d4e1;
-  --ds-color-focus: #4f8fba;
+  /* ─── Success — X Green ─── */
+  --ds-color-success-50: #e6faf2;
+  --ds-color-success-100: #bcf2de;
+  --ds-color-success-200: #80e6bc;
+  --ds-color-success-300: #42d99a;
+  --ds-color-success-400: #00d27a;
+  --ds-color-success-500: #00ba7c;
+  --ds-color-success-600: #00a76f;
+  --ds-color-success-700: #008c5e;
 
-  --ds-color-primary-500: #0f6b9f;
-  --ds-color-primary-600: #0c5681;
-  --ds-color-primary-700: #09476e;
+  /* ─── Danger — X Red ─── */
+  --ds-color-danger-50: #fef1f2;
+  --ds-color-danger-100: #fdd5d8;
+  --ds-color-danger-200: #fba9af;
+  --ds-color-danger-300: #f97d87;
+  --ds-color-danger-400: #f4212e;
+  --ds-color-danger-500: #f4212e;
+  --ds-color-danger-600: #d91b27;
+  --ds-color-danger-700: #b91c1c;
 
-  --ds-color-danger-500: #9c3528;
-  --ds-color-danger-600: #842a20;
+  /* ─── Warning — Amber ─── */
+  --ds-color-warning-50: #fff9eb;
+  --ds-color-warning-100: #fef0c7;
+  --ds-color-warning-200: #fde38a;
+  --ds-color-warning-300: #fcd44d;
+  --ds-color-warning-400: #ffad1f;
+  --ds-color-warning-500: #ffad1f;
+  --ds-color-warning-600: #d97706;
+  --ds-color-warning-700: #b45309;
 
-  --ds-color-success-100: #def6ea;
-  --ds-color-success-700: #0e5c36;
+  /* ─── Like/Social — X Pink ─── */
+  --ds-color-like-50: #fdf2f8;
+  --ds-color-like-100: #fce7f3;
+  --ds-color-like-200: #fbcfe8;
+  --ds-color-like-300: #f8b4d0;
+  --ds-color-like-400: #f472b6;
+  --ds-color-like-500: #f91880;
+  --ds-color-like-600: #db2777;
+  --ds-color-like-700: #be185d;
 
-  --ds-color-warning-100: #fff0dd;
-  --ds-color-warning-700: #7e4d18;
+  /* ─── Backgrounds — True dark (X Lights Out) ─── */
+  --ds-color-bg-canvas: #000000;
+  --ds-color-bg-surface: #16181c;
+  --ds-color-bg-surface-soft: #1d1f23;
+  --ds-color-bg-surface-softer: #202327;
+  --ds-color-bg-overlay: rgba(91, 112, 131, 0.4);
+  --ds-color-bg-brand: linear-gradient(135deg, #1d9bf0 0%, #7856ff 100%);
 
-  --ds-color-like-100: #d7ebfa;
-  --ds-color-like-700: #124f77;
+  /* ─── Text Colors — X dark theme palette ─── */
+  --ds-color-text-strong: #e7e9ea;
+  --ds-color-text: #e7e9ea;
+  --ds-color-text-muted: #71767b;
+  --ds-color-text-softer: #536471;
+  --ds-color-text-inverse: #0f1419;
 
+  /* ─── Borders ─── */
+  --ds-color-border-subtle: #2f3336;
+  --ds-color-border-strong: #3e4144;
+  --ds-color-border-brand: #1d9bf0;
+  --ds-color-focus: #1d9bf0;
+
+  /* ─── Spacing Scale ─── */
+  --ds-space-0: 0;
   --ds-space-1: 0.25rem;
   --ds-space-2: 0.5rem;
   --ds-space-3: 0.75rem;
@@ -44,22 +100,68 @@
   --ds-space-6: 1.5rem;
   --ds-space-7: 1.75rem;
   --ds-space-8: 2rem;
+  --ds-space-9: 2.25rem;
+  --ds-space-10: 2.5rem;
+  --ds-space-12: 3rem;
+  --ds-space-14: 3.5rem;
+  --ds-space-16: 4rem;
 
+  /* ─── Border Radius ─── */
+  --ds-radius-none: 0;
+  --ds-radius-xs: 0.25rem;
   --ds-radius-sm: 0.5rem;
   --ds-radius-md: 0.75rem;
   --ds-radius-lg: 1rem;
   --ds-radius-xl: 1.25rem;
+  --ds-radius-2xl: 1.5rem;
   --ds-radius-pill: 999px;
 
-  --ds-shadow-xs: 0 1px 2px rgba(9, 28, 44, 0.08);
-  --ds-shadow-sm: 0 6px 16px rgba(12, 37, 56, 0.1);
-  --ds-shadow-md: 0 14px 30px rgba(12, 37, 56, 0.12);
+  /* ─── Shadows — subtle for dark UI ─── */
+  --ds-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --ds-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --ds-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --ds-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --ds-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  --ds-shadow-focus: 0 0 0 2px #000, 0 0 0 4px #1d9bf0;
+  --ds-shadow-popup: rgba(255, 255, 255, 0.2) 0px 0px 15px, rgba(255, 255, 255, 0.15) 0px 0px 3px 1px;
 
-  --ds-duration-fast: 120ms;
-  --ds-duration-base: 180ms;
-  --ds-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* ─── Typography ─── */
+  --ds-font-size-xs: 0.75rem;
+  --ds-font-size-sm: 0.8125rem;
+  --ds-font-size-base: 0.9375rem;
+  --ds-font-size-lg: 1.0625rem;
+  --ds-font-size-xl: 1.25rem;
+  --ds-font-size-2xl: 1.5rem;
+  --ds-font-size-3xl: 1.875rem;
+  --ds-font-size-4xl: 2.25rem;
+
+  --ds-line-height-tight: 1.2;
+  --ds-line-height-snug: 1.35;
+  --ds-line-height-normal: 1.5;
+  --ds-line-height-relaxed: 1.625;
+
+  /* ─── Animations ─── */
+  --ds-duration-75: 75ms;
+  --ds-duration-100: 100ms;
+  --ds-duration-150: 150ms;
+  --ds-duration-200: 200ms;
+  --ds-duration-300: 300ms;
+  --ds-duration-500: 500ms;
+  --ds-duration-700: 700ms;
+  --ds-duration-1000: 1000ms;
+
+  --ds-ease-linear: linear;
+  --ds-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ds-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ds-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ─── Transitions ─── */
+  --ds-transition-fast: all var(--ds-duration-150) var(--ds-ease-out);
+  --ds-transition-base: all var(--ds-duration-200) var(--ds-ease-out);
+  --ds-transition-smooth: all var(--ds-duration-300) var(--ds-ease-out);
 }
 
+/* ─── Reset ─── */
 *,
 *::before,
 *::after {
@@ -78,21 +180,15 @@ body {
   font-size: 15px;
   line-height: 1.45;
   color: var(--ds-color-text);
-  background:
-    radial-gradient(circle at 8% 2%, rgba(126, 178, 214, 0.28), transparent 24%),
-    radial-gradient(circle at 92% 90%, rgba(254, 203, 154, 0.28), transparent 30%),
-    linear-gradient(165deg, #ecf4fb 0%, #f7fbff 54%, #fff8f0 100%);
+  background: #000;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   margin: 0;
   font-family: var(--ds-font-heading);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--ds-color-text-strong);
 }
 
@@ -101,7 +197,7 @@ p {
 }
 
 a {
-  color: inherit;
+  color: var(--ds-color-primary-500);
   text-decoration: none;
 }
 
@@ -118,29 +214,30 @@ select {
 
 :focus-visible {
   outline: 2px solid var(--ds-color-focus);
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 
+/* ─── DS Base Cards ─── */
 .ds-card {
-  background: color-mix(in srgb, var(--ds-color-bg-surface) 95%, transparent);
+  background: var(--ds-color-bg-surface);
   border: 1px solid var(--ds-color-border-subtle);
   border-radius: var(--ds-radius-xl);
-  box-shadow: var(--ds-shadow-sm);
+  box-shadow: none;
 }
 
+/* ─── DS Inputs ─── */
 .ds-input,
 .ds-textarea,
 .ds-select {
   width: 100%;
-  border: 1px solid var(--ds-color-border-strong);
+  border: 1px solid var(--ds-color-border-subtle);
   border-radius: var(--ds-radius-md);
-  background: var(--ds-color-bg-surface);
+  background: var(--ds-color-bg-canvas);
   color: var(--ds-color-text-strong);
   padding: 0.64rem 0.78rem;
   transition:
-    border-color var(--ds-duration-fast) var(--ds-ease-out),
-    box-shadow var(--ds-duration-fast) var(--ds-ease-out),
-    background-color var(--ds-duration-fast) var(--ds-ease-out);
+    border-color var(--ds-duration-150) var(--ds-ease-out),
+    box-shadow var(--ds-duration-150) var(--ds-ease-out);
 }
 
 .ds-input::placeholder,
@@ -151,131 +248,176 @@ select {
 .ds-input:hover,
 .ds-textarea:hover,
 .ds-select:hover {
-  border-color: #aec3d4;
+  border-color: var(--ds-color-border-strong);
+}
+
+.ds-input:focus,
+.ds-textarea:focus,
+.ds-select:focus {
+  border-color: var(--ds-color-primary-500);
+  box-shadow: 0 0 0 1px var(--ds-color-primary-500);
+  outline: none;
 }
 
 .ds-textarea {
   resize: vertical;
 }
 
+/* ─── DS Buttons ─── */
 .ds-button {
   border: 0;
-  border-radius: var(--ds-radius-md);
-  font-weight: 600;
-  padding: 0.5rem 0.86rem;
+  border-radius: var(--ds-radius-pill);
+  font-weight: 700;
+  padding: 0.5rem 1rem;
   cursor: pointer;
   transition:
-    transform var(--ds-duration-fast) var(--ds-ease-out),
-    filter var(--ds-duration-fast) var(--ds-ease-out),
-    opacity var(--ds-duration-fast) var(--ds-ease-out),
-    box-shadow var(--ds-duration-fast) var(--ds-ease-out);
+    background-color var(--ds-duration-200) var(--ds-ease-out),
+    filter var(--ds-duration-200) var(--ds-ease-out),
+    opacity var(--ds-duration-200) var(--ds-ease-out);
 }
 
 .ds-button:hover {
-  transform: translateY(-1px);
+  filter: brightness(1.1);
 }
 
 .ds-button:active {
-  transform: translateY(0);
+  filter: brightness(0.95);
 }
 
 .ds-button:disabled {
-  opacity: 0.58;
+  opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
-  filter: grayscale(0.08);
+  filter: none;
 }
 
 .ds-button--primary {
-  background: linear-gradient(145deg, var(--ds-color-primary-500), var(--ds-color-primary-700));
-  color: var(--ds-color-text-inverse);
-  box-shadow: var(--ds-shadow-xs);
+  background: var(--ds-color-primary-500);
+  color: #fff;
 }
 
 .ds-button--primary:hover {
-  filter: brightness(1.02);
+  background: var(--ds-color-primary-600);
 }
 
 .ds-button--ghost {
-  background: #e9f1f7;
-  color: #1f4b67;
+  background: transparent;
+  color: var(--ds-color-text);
+  border: 1px solid var(--ds-color-border-subtle);
+}
+
+.ds-button--ghost:hover {
+  background: rgba(239, 243, 244, 0.1);
 }
 
 .ds-button--danger {
-  background: linear-gradient(145deg, var(--ds-color-danger-500), var(--ds-color-danger-600));
-  color: #fff1ee;
+  background: var(--ds-color-danger-500);
+  color: #fff;
 }
 
+.ds-button--danger:hover {
+  background: var(--ds-color-danger-600);
+}
+
+/* ─── DS Badges ─── */
 .ds-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--ds-radius-pill);
-  padding: 0.2rem 0.56rem;
+  padding: 0.15rem 0.5rem;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.03em;
 }
 
 .ds-badge--neutral {
-  background: #e8f1f8;
-  color: #265271;
+  background: var(--ds-color-bg-surface-softer);
+  color: var(--ds-color-text-muted);
 }
 
 .ds-badge--success {
-  background: var(--ds-color-success-100);
-  color: var(--ds-color-success-700);
+  background: rgba(0, 186, 124, 0.15);
+  color: var(--ds-color-success-500);
 }
 
 .ds-badge--warning {
-  background: var(--ds-color-warning-100);
-  color: var(--ds-color-warning-700);
+  background: rgba(255, 173, 31, 0.15);
+  color: var(--ds-color-warning-500);
 }
 
 .ds-badge--like {
-  background: var(--ds-color-like-100);
-  color: var(--ds-color-like-700);
+  background: rgba(249, 24, 128, 0.15);
+  color: var(--ds-color-like-500);
 }
 
 .ds-kicker {
   text-transform: uppercase;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.08em;
   font-size: 0.72rem;
   color: var(--ds-color-text-muted);
   font-weight: 700;
 }
 
 .ds-title {
-  font-weight: 700;
-  font-size: 1.03rem;
+  font-weight: 800;
+  font-size: 1.25rem;
   color: var(--ds-color-text-strong);
 }
 
 .ds-meta {
-  font-size: 0.82rem;
+  font-size: 0.8125rem;
   color: var(--ds-color-text-muted);
 }
 
 .ds-danger-banner {
-  border: 1px solid #efc2bc;
-  background: #fff0ed;
-  color: #8b2e22;
+  border: 1px solid rgba(244, 33, 46, 0.4);
+  background: rgba(244, 33, 46, 0.1);
+  color: #ffd9dc;
   border-radius: var(--ds-radius-md);
   padding: 0.52rem 0.68rem;
-  font-size: 0.88rem;
+  font-size: 0.875rem;
 }
 
+/* ─── Scrollbar ─── */
 .ds-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #b4c9d9 transparent;
+  scrollbar-color: #3e4144 transparent;
 }
 
 .ds-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 .ds-scrollbar::-webkit-scrollbar-thumb {
   border-radius: var(--ds-radius-pill);
-  background: #b4c9d9;
+  background: #3e4144;
+}
+
+/* ─── Animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.3); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.15); }
+  60% { transform: scale(1); }
 }

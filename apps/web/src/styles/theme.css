@@ -1,0 +1,170 @@
+/* ============================================================================
+   THEME VARIATIONS & UTILITY CLASSES
+   Dark-first design — light mode is the optional variant
+   ============================================================================ */
+
+/* Light Mode Override (optional) */
+@media (prefers-color-scheme: light) {
+  /* NOTE: Orbit is dark-first. We keep the dark theme always.
+     To enable a light mode in the future, uncomment and fill in. */
+}
+
+/* High Contrast Theme */
+.high-contrast {
+  --ds-color-primary-500: #1a94e6;
+  --ds-color-danger-500: #f4212e;
+  --ds-color-text-strong: #ffffff;
+  --ds-color-text: #ffffff;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  * {
+    background: transparent;
+    color: black;
+    box-shadow: none;
+    text-shadow: none;
+  }
+
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  @page {
+    margin: 0.5cm;
+  }
+
+  body {
+    background: white;
+  }
+
+  .no-print,
+  .modal-backdrop,
+  .modal-overlay,
+  nav {
+    display: none;
+  }
+}
+
+/* ─── Font Size Variations ─── */
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.8125rem; }
+.text-base { font-size: 0.9375rem; }
+.text-lg { font-size: 1.0625rem; }
+.text-xl { font-size: 1.25rem; }
+.text-2xl { font-size: 1.5rem; }
+.text-3xl { font-size: 1.875rem; }
+.text-4xl { font-size: 2.25rem; }
+
+/* ─── Font Weight ─── */
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+
+/* ─── Text Colors ─── */
+.text-strong { color: #e7e9ea; }
+.text-default { color: #e7e9ea; }
+.text-muted { color: #71767b; }
+.text-primary { color: #1d9bf0; }
+.text-success { color: #00ba7c; }
+.text-warning { color: #ffad1f; }
+.text-danger { color: #f4212e; }
+
+/* ─── Background Colors ─── */
+.bg-primary { background: #1d9bf0; }
+.bg-success { background: #00ba7c; }
+.bg-warning { background: #ffad1f; }
+.bg-danger { background: #f4212e; }
+
+/* ─── Spacing ─── */
+.m-auto { margin: auto; }
+.p-0 { padding: 0; }
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 0.75rem; }
+.p-4 { padding: 1rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+
+/* ─── Display ─── */
+.hidden { display: none !important; }
+.inline { display: inline; }
+.inline-block { display: inline-block; }
+.block { display: block; }
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.grid { display: grid; }
+
+/* ─── Flex ─── */
+.flex-row { flex-direction: row; }
+.flex-col { flex-direction: column; }
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+
+/* ─── Opacity ─── */
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+.opacity-100 { opacity: 1; }
+
+/* ─── Cursor ─── */
+.cursor-pointer { cursor: pointer; }
+.cursor-default { cursor: default; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+/* ─── Overflow ─── */
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+.overflow-visible { overflow: visible; }
+
+/* ─── Position ─── */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+
+/* ─── Border ─── */
+.border-none { border: none; }
+.rounded-sm { border-radius: 0.5rem; }
+.rounded-md { border-radius: 0.75rem; }
+.rounded-lg { border-radius: 1rem; }
+.rounded-full { border-radius: 999px; }
+
+/* ─── Shadow ─── */
+.shadow-none { box-shadow: none; }
+.shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+.shadow-md { box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
+.shadow-lg { box-shadow: 0 10px 15px rgba(0,0,0,0.4); }
+.shadow-xl { box-shadow: 0 20px 25px rgba(0,0,0,0.5); }
