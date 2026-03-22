@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { asyncHandler, HttpError } from "../lib/http.js";
+import { matchesSearchQuery } from "../lib/search.js";
 import { createId, mutateDatabase, nowIso, readDatabase } from "../lib/store.js";
 import { interactionCreateSchema, interactionListQuerySchema, interactionUpdateSchema } from "../lib/validators.js";
 
@@ -9,7 +10,6 @@ interactionsRouter.get(
   "/",
   asyncHandler(async (req, res) => {
     const { q, limit = 20, page = 1, postId, authorId, type } = interactionListQuerySchema.parse(req.query);
-    const needle = q?.toLowerCase();
 
     const db = await readDatabase();
     const filtered = db.interactions
@@ -26,18 +26,11 @@ interactionsRouter.get(
           return false;
         }
 
-        if (!needle) {
-          return true;
-        }
-
         const authorName =
           db.profiles.find((profile) => profile.id === interaction.authorId)?.displayName ?? "";
         const postContent = db.posts.find((post) => post.id === interaction.postId)?.content ?? "";
 
-        return [interaction.content ?? "", authorName, postContent]
-          .join(" ")
-          .toLowerCase()
-          .includes(needle);
+        return matchesSearchQuery([interaction.content, authorName, postContent], q);
       })
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
