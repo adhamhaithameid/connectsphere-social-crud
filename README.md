@@ -1,55 +1,46 @@
-# ConnectSphere - Social Media CRUD Platform
+# ConnectSphere Social CRUD
 
-A full-stack social media application built for internship evaluation.
-
-It supports complete CRUD workflows for:
-- Profiles
-- Posts
-- Interactions (likes, comments, shares)
+ConnectSphere Social CRUD is a full-stack social platform demo with complete CRUD flows for profiles, posts, and interactions.
 
 ## Tech Stack
 
-- Frontend: React 19, TypeScript, Vite, TanStack Query, React Hook Form
-- Backend: Node.js, Express, TypeScript, Zod validation
-- Data Store: JSON file persistence (`apps/api/data/db.json`) for zero-friction setup
-- Package manager: pnpm workspaces
+- Frontend: React 19, TypeScript, Vite, TanStack Query, React Router
+- Backend: Node.js, Express, TypeScript, Zod
+- Data layer: JSON persistence in `apps/api/data/db.json`
+- Workspace: pnpm monorepo
 
-## Project Structure
+## Repository Layout
 
 ```text
 apps/
-  api/   # Express REST API
-  web/   # React frontend
+  api/  # REST API
+  web/  # React frontend
 ```
 
-## Features
+## Core Features
 
-- Twitter/Facebook-style social timeline layout
-- Dedicated design system (tokens + component primitives) applied across the UI
-- Simulated account switching (active profile) for multi-user testing
-- Create, read, update, and delete user profiles
-- Create, read, update, and delete posts with visibility levels
-- Real interaction actions on timeline cards: like, comment, share
-- Edit and delete your own posts and comments inline
-- Recent vs popular feed sorting with search
-- Live network metrics (totals + interaction breakdown)
-- Seeded social dataset for instant review
+- Timeline/feed with recent and popular sorting
+- Profile, post, and interaction CRUD endpoints
+- Inline social actions (like, comment, share)
+- Search support on listing endpoints
+- Tokenized and normalized search matcher (accent and punctuation tolerant)
+- Fixture-driven API search regression tests
 
-## Quick Start
+## Getting Started
 
-### 1. Install dependencies
+1. Install dependencies:
 
 ```bash
 pnpm install
 ```
 
-### 2. Seed demo data
+2. Seed demo data:
 
 ```bash
 pnpm seed
 ```
 
-### 3. Run frontend + backend
+3. Run the API and web app:
 
 ```bash
 pnpm dev
@@ -58,60 +49,36 @@ pnpm dev
 - API: `http://localhost:4000`
 - Web: `http://localhost:5173`
 
-## Scripts
+## Workspace Scripts
 
-- `pnpm dev` - run API + web in parallel
-- `pnpm seed` - reset and seed demo data
-- `pnpm crud:smoke` - run API CRUD smoke test (requires API running)
+- `pnpm dev` - run all apps in dev mode
+- `pnpm seed` - seed API datastore
+- `pnpm crud:smoke` - CRUD smoke script for the API
 - `pnpm typecheck` - TypeScript checks for all workspaces
-- `pnpm lint` - lint all workspaces
-- `pnpm build` - production build for all workspaces
+- `pnpm lint` - run workspace lint scripts
+- `pnpm build` - production builds
 
-## API Endpoints
+## API Routes
 
-### Health
 - `GET /health`
-
-### Feed
 - `GET /api/feed/overview`
+- `GET|POST /api/profiles`
+- `GET|PATCH|DELETE /api/profiles/:id`
+- `GET|POST /api/posts`
+- `GET|PATCH|DELETE /api/posts/:id`
+- `GET|POST /api/interactions`
+- `PATCH|DELETE /api/interactions/:id`
 
-### Profiles
-- `GET /api/profiles`
-- `GET /api/profiles/:id`
-- `POST /api/profiles`
-- `PATCH /api/profiles/:id`
-- `DELETE /api/profiles/:id`
+## Environment
 
-### Posts
-- `GET /api/posts?sort=recent|popular`
-- `GET /api/posts/:id`
-- `POST /api/posts`
-- `PATCH /api/posts/:id`
-- `DELETE /api/posts/:id`
-
-### Interactions
-- `GET /api/interactions`
-- `POST /api/interactions`
-- `PATCH /api/interactions/:id`
-- `DELETE /api/interactions/:id`
-
-## Environment Variables
-
-### API (`apps/api/.env`)
+API (`apps/api/.env`):
 
 ```env
 PORT=4000
 ```
 
-### Web (`apps/web/.env`)
+Web (`apps/web/.env`):
 
 ```env
 VITE_API_URL="http://localhost:4000"
 ```
-
-## Notes
-
-- This project uses a file-backed datastore to keep setup simple for reviewers.
-- Data persists in `apps/api/data/db.json`.
-- Running `pnpm seed` resets this data file with curated sample records.
-- Design system source: `apps/web/src/styles/design-system.css`.
