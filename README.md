@@ -1,6 +1,6 @@
-# ConnectSphere Social CRUD
+# Orbit Social Platform
 
-ConnectSphere Social CRUD is a full-stack social platform demo with complete CRUD flows for profiles, posts, and interactions.
+Orbit is a full-stack social platform demo with complete CRUD flows for profiles, posts, and interactions.
 
 ## Tech Stack
 

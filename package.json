@@ -1,15 +1,15 @@
 {
-  "name": "connectsphere-social-crud",
+  "name": "orbit-social-platform",
   "private": true,
   "version": "1.0.0",
-  "description": "Full-stack social media CRUD platform for internship portfolio",
+  "description": "Orbit social platform monorepo",
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
-    "seed": "pnpm --filter @connectsphere/api seed",
-    "crud:smoke": "pnpm --filter @connectsphere/api crud:smoke"
+    "seed": "pnpm --filter @orbit/api seed",
+    "crud:smoke": "pnpm --filter @orbit/api crud:smoke"
   },
   "engines": {
     "node": ">=20"

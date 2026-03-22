@@ -1,9 +1,9 @@
-# Web App
+# Orbit Web App
 
-React + Vite frontend for ConnectSphere.
+React + Vite frontend for Orbit.
 
 Run from workspace root:
 
 ```bash
-pnpm --filter @connectsphere/web dev
+pnpm --filter @orbit/web dev
 ```
