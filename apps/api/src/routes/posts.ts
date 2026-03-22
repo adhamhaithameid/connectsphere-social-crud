@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { asyncHandler, HttpError } from "../lib/http.js";
+import { matchesSearchQuery } from "../lib/search.js";
 import { createId, mutateDatabase, nowIso, readDatabase } from "../lib/store.js";
 import { postCreateSchema, postListQuerySchema, postUpdateSchema } from "../lib/validators.js";
 
@@ -10,7 +11,6 @@ postsRouter.get(
   asyncHandler(async (req, res) => {
     const { q, limit = 20, page = 1, authorId, visibility, sort = "recent" } =
       postListQuerySchema.parse(req.query);
-    const needle = q?.toLowerCase();
 
     const db = await readDatabase();
     const interactionCountByPost = new Map<string, number>();
@@ -32,14 +32,10 @@ postsRouter.get(
           return false;
         }
 
-        if (!needle) {
-          return true;
-        }
-
         const authorName =
           db.profiles.find((profile) => profile.id === post.authorId)?.displayName ?? "";
 
-        return [post.content, authorName].join(" ").toLowerCase().includes(needle);
+        return matchesSearchQuery([post.content, authorName], q);
       })
       .sort((a, b) => {
         if (sort === "popular") {
